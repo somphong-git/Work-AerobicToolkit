@@ -4,8 +4,8 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "work-aerobictoolkit"
-version = "0.2.0"
-description = "A foundation-first toolkit for building aerobic DJ mix workflows."
+version = "0.3.0"
+description = "Audio analysis engine for building aerobic DJ mix workflows."
 readme = "README.md"
 requires-python = ">=3.12"
 license = "MIT"
@@ -21,11 +21,17 @@ classifiers = [
     "Programming Language :: Python :: 3.12",
     "Topic :: Multimedia :: Sound/Audio",
 ]
-dependencies = []
+dependencies = [
+    "mutagen>=1.47",
+]
 
 [project.optional-dependencies]
+analysis = [
+    "librosa>=0.11",
+]
 dev = [
     "build>=1.2",
+    "librosa>=0.11",
     "pytest>=8.0",
     "ruff>=0.12",
 ]

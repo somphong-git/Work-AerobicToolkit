@@ -4,9 +4,8 @@ Work-AerobicToolkit is an open-source, engine-first foundation for aerobic DJ
 mix workflows. The same core package is intended to support future CLI,
 desktop, web, API, plugin, agent, and mobile interfaces.
 
-> **Project status:** pre-alpha. Sprint 2.2 establishes repository standards;
-> BPM analysis, playlist generation, and mix rendering are deliberately not
-> implemented yet.
+> **Project status:** pre-alpha. Sprint 2.3 provides local track metadata and
+> BPM estimation. Playlist generation and mix rendering remain future work.
 
 ## Installation
 
@@ -25,6 +24,19 @@ platforms and troubleshooting.
 python -m aerobictoolkit --version
 python -m aerobictoolkit --help
 ```
+
+## Analyze audio
+
+Put local tracks in `data/input/`, then scan them or analyze an individual
+file. BPM estimation is provided by the optional `analysis` dependency group.
+
+```powershell
+python -m pip install -e ".[analysis]"
+python -m aerobictoolkit scan data/input
+python -m aerobictoolkit analyze "data/input/your-track.mp3" --json
+```
+
+Use `--no-bpm` to inspect metadata only.
 
 ## Repository layout
 

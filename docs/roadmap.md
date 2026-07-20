@@ -1,23 +1,21 @@
 # Roadmap
 
-## Current: Sprint 2.2 — Repository Modernization
+## Current: Sprint 2.3 — Core Audio Analysis
 
-The immediate goal is a professional, contributor-ready repository before any
-new audio or mixing capability is developed.
+The immediate goal is a reusable, testable audio-analysis boundary for all
+future clients.
 
-- [x] Move source code to the `src/` package layout.
-- [x] Consolidate local runtime files under `data/`.
-- [x] Configure packaging, Ruff, and pytest.
-- [x] Add documentation, contributor standards, and security guidance.
-- [x] Add GitHub issue forms, pull-request template, Dependabot, and workflows.
-- [x] Add build, lint, format, release, and documentation scripts.
+- [x] Define immutable metadata and analysis result models.
+- [x] Read supported local track metadata and duration.
+- [x] Estimate BPM through an optional audio-analysis adapter.
+- [x] Expose scan and analyze workflows through the CLI.
+- [x] Cover engine behavior with automated tests.
 
-## Next: engine discovery sprint
+## Next: playlist intelligence sprint
 
 The next sprint will begin only after an issue defines a narrow, testable
-outcome. Candidate work includes a stable track metadata model and a
-well-specified scanner contract. BPM analysis, energy analysis, playlist
-optimization, and mix rendering remain explicitly deferred.
+outcome. Candidate work includes energy analysis, BPM confidence, and playlist
+optimization. Mix rendering remains explicitly deferred.
 
 ## Delivery rules
 

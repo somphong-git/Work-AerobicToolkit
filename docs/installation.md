@@ -36,5 +36,13 @@ python -m pytest
 ```
 
 If your shell cannot find Python, install Python 3.12+ and reopen the terminal.
-The repository currently has no mandatory audio-processing dependency; those
-will be introduced with the engine features that use them.
+## BPM analysis dependency
+
+Track metadata is installed with the base package. Install the optional audio
+analysis group to estimate BPM:
+
+```bash
+python -m pip install -e ".[analysis]"
+```
+
+The development extra already includes this group.

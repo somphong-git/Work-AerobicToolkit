@@ -1,64 +1,44 @@
-# -------------------------
 # Python
-# -------------------------
-
 __pycache__/
 *.py[cod]
 *$py.class
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+.coverage
+coverage.xml
+htmlcov/
 
-# Virtual Environment
+# Packaging
+build/
+dist/
 
+# Virtual environments and local tooling
 .venv/
 venv/
 env/
-
-# IDE
-
-.vscode/
 .idea/
+.vscode/
 
-# Logs
-
-*.log
-
-# OS
-
-.DS_Store
-Thumbs.db
-
-# -------------------------
-# Audio Files
-# -------------------------
-
-input/*
-!input/.gitkeep
-
-output/*
-!output/.gitkeep
-
-reports/*
-!reports/.gitkeep
-
-# Project data directories
-data/input/*
-!data/input/.gitkeep
-data/output/*
-!data/output/.gitkeep
-data/reports/*
-!data/reports/.gitkeep
-data/cache/*
-!data/cache/.gitkeep
-
-*.mp3
-*.wav
-*.flac
+# Local data and generated audio artifacts
+/data/input/*
+!/data/input/.gitkeep
+/data/output/*
+!/data/output/.gitkeep
+/data/reports/*
+!/data/reports/.gitkeep
+/data/cache/*
+!/data/cache/.gitkeep
 *.aac
+*.flac
 *.m4a
+*.mp3
 *.ogg
+*.wav
 
-# -------------------------
-# Temporary
-# -------------------------
-
+# Logs and operating-system files
+*.log
 *.tmp
 *.bak
+.DS_Store
+Thumbs.db

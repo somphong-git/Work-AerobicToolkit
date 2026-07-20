@@ -1,26 +1,39 @@
 [build-system]
-requires = ["setuptools>=68"]
+requires = ["setuptools>=77"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "work-aerobictoolkit"
-version = "0.1.0"
-description = "Open-source toolkit for creating professional aerobic DJ mixes."
+version = "0.2.0"
+description = "A foundation-first toolkit for building aerobic DJ mix workflows."
 readme = "README.md"
 requires-python = ">=3.12"
-license = { file = "LICENSE" }
+license = "MIT"
+authors = [
+    { name = "Work-AerobicToolkit contributors" },
+]
+keywords = ["aerobics", "audio", "dj", "mixing", "playlist"]
+classifiers = [
+    "Development Status :: 2 - Pre-Alpha",
+    "Intended Audience :: Developers",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Multimedia :: Sound/Audio",
+]
 dependencies = []
 
 [project.optional-dependencies]
-audio = [
-    "librosa",
-    "numpy",
-    "pandas",
-    "soundfile",
-    "pydub",
-    "mutagen",
+dev = [
+    "build>=1.2",
+    "pytest>=8.0",
+    "ruff>=0.12",
 ]
-dev = ["pytest", "ruff"]
+
+[project.urls]
+Homepage = "https://github.com/somphong-git/Work-AerobicToolkit"
+Issues = "https://github.com/somphong-git/Work-AerobicToolkit/issues"
+Repository = "https://github.com/somphong-git/Work-AerobicToolkit"
 
 [project.scripts]
 aerobictoolkit = "aerobictoolkit.cli:main"
@@ -28,11 +41,23 @@ aerobictoolkit = "aerobictoolkit.cli:main"
 [tool.setuptools.packages.find]
 where = ["src"]
 
+[tool.setuptools.package-data]
+aerobictoolkit = ["config/*.yaml"]
+
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 pythonpath = ["src"]
+addopts = ["-ra", "--strict-markers"]
+cache_dir = "data/cache/pytest"
 
 [tool.ruff]
 line-length = 88
 target-version = "py312"
 
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM"]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+line-ending = "lf"

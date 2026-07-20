@@ -1,2 +1,1 @@
 """Dashboard-facing adapters."""
-

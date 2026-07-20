@@ -1,27 +1,54 @@
-__pycache__/
-*.pyc
-*.pyo
+# -------------------------
+# Python
+# -------------------------
 
-.vscode/
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual Environment
 
 .venv/
 venv/
+env/
 
-output/
+# IDE
+
+.vscode/
+.idea/
+
+# Logs
 
 *.log
 
-.DS_Store
+# OS
 
+.DS_Store
 Thumbs.db
 
+# -------------------------
 # Audio Files
+# -------------------------
+
 input/*
 !input/.gitkeep
+
+output/*
+!output/.gitkeep
+
+reports/*
+!reports/.gitkeep
 
 *.mp3
 *.wav
 *.flac
-*.m4a
 *.aac
+*.m4a
 *.ogg
+
+# -------------------------
+# Temporary
+# -------------------------
+
+*.tmp
+*.bak

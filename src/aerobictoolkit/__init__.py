@@ -1,4 +1,3 @@
-"""Core package for Work-AerobicToolkit."""
+"""Public package for Work-AerobicToolkit."""
 
-__version__ = "0.1.0"
-
+__version__ = "0.2.0"

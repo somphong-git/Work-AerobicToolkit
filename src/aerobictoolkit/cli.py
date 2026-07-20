@@ -1,4 +1,8 @@
-"""Command-line entry point for Work-AerobicToolkit."""
+"""Command-line entry point for Work-AerobicToolkit.
+
+The CLI currently verifies installation only. Product commands are intentionally
+deferred until the repository foundation is complete.
+"""
 
 from __future__ import annotations
 
@@ -23,4 +27,3 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
-

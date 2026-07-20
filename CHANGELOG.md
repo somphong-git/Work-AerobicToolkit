@@ -8,7 +8,18 @@ All notable changes to this project are documented here. This project follows
 
 ### Planned
 
-- Define the first engine feature through an issue-driven sprint.
+- Add energy analysis and playlist intelligence.
+
+## [0.3.0] - 2026-07-20
+
+### Added
+
+- Reusable `TrackMetadata` and `TrackAnalysis` result contracts.
+- Local audio metadata and duration inspection powered by Mutagen.
+- Optional BPM estimation powered by librosa.
+- `scan` and `analyze` CLI commands, including JSON output.
+- Automated coverage for metadata, BPM-adapter normalization, and result
+  behavior.
 
 ## [0.2.0] - 2026-07-20
 
@@ -27,5 +38,6 @@ All notable changes to this project are documented here. This project follows
 - Moved local input, output, report, and cache directories under `data/`.
 - Moved the existing music scanner into `src/aerobictoolkit/analysis/`.
 
-[Unreleased]: https://github.com/somphong-git/Work-AerobicToolkit/compare/v0.2.0...HEAD
+[Unreleased]: https://github.com/somphong-git/Work-AerobicToolkit/compare/v0.3.0...HEAD
+[0.3.0]: https://github.com/somphong-git/Work-AerobicToolkit/releases/tag/v0.3.0
 [0.2.0]: https://github.com/somphong-git/Work-AerobicToolkit/releases/tag/v0.2.0

@@ -2,17 +2,17 @@
 
 ## Current capability
 
-This release is a repository foundation, not a finished DJ-mixing product. The
-available command validates that the package is installed:
+This release can scan local tracks, read their metadata, and estimate BPM. It
+is not yet a finished DJ-mixing product.
 
 ```bash
 python -m aerobictoolkit --version
-python -m aerobictoolkit --help
+python -m aerobictoolkit scan data/input
+python -m aerobictoolkit analyze "data/input/your-track.mp3" --json
 ```
 
-The examples directory contains a basic file-scanning example and placeholders
-that make the upcoming BPM and playlist learning paths visible without claiming
-that those features exist.
+For metadata only, append `--no-bpm`. BPM estimation requires the optional
+`analysis` installation group described in the installation guide.
 
 ## Local data directories
 

@@ -1,11 +1,12 @@
+
+[audio]
 librosa
 numpy
 pandas
 soundfile
 pydub
 mutagen
-openpyxl
-rich
-tqdm
+
+[dev]
 pytest
 ruff

@@ -1,3 +1,23 @@
+Metadata-Version: 2.4
+Name: work-aerobictoolkit
+Version: 0.1.0
+Summary: Open-source toolkit for creating professional aerobic DJ mixes.
+License: MIT License
+Requires-Python: >=3.12
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Provides-Extra: audio
+Requires-Dist: librosa; extra == "audio"
+Requires-Dist: numpy; extra == "audio"
+Requires-Dist: pandas; extra == "audio"
+Requires-Dist: soundfile; extra == "audio"
+Requires-Dist: pydub; extra == "audio"
+Requires-Dist: mutagen; extra == "audio"
+Provides-Extra: dev
+Requires-Dist: pytest; extra == "dev"
+Requires-Dist: ruff; extra == "dev"
+Dynamic: license-file
+
 # Work-AerobicToolkit
 
 Open Source toolkit for creating professional Aerobic DJ Mixes.

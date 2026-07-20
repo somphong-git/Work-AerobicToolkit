@@ -39,6 +39,16 @@ output/*
 reports/*
 !reports/.gitkeep
 
+# Project data directories
+data/input/*
+!data/input/.gitkeep
+data/output/*
+!data/output/.gitkeep
+data/reports/*
+!data/reports/.gitkeep
+data/cache/*
+!data/cache/.gitkeep
+
 *.mp3
 *.wav
 *.flac

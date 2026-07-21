@@ -4,9 +4,9 @@ Work-AerobicToolkit is an open-source, engine-first foundation for aerobic DJ
 mix workflows. The same core package is intended to support future CLI,
 desktop, web, API, plugin, agent, and mobile interfaces.
 
-> **Project status:** pre-alpha. Sprint 2.9 adds portable metadata transfer and
-> consistent catalog backups. Playlist generation and mix rendering remain
-> future work.
+> **Project status:** pre-alpha. Sprint 3.0 establishes the workout-session
+> domain model. Automatic playlist generation and mix rendering remain future
+> work.
 
 ## Installation
 
@@ -119,6 +119,23 @@ JSON is versioned for application integration. CSV is UTF-8 with BOM for
 spreadsheet compatibility. Import updates matching paths, merges incoming tags,
 and reports separate imported and updated counts. A backup contains the full
 database and can be selected with `--database` immediately.
+
+## Model a workout session
+
+Create the standard four-phase 60-minute planning template from the shared
+engine:
+
+```python
+from aerobictoolkit.playlist import WorkoutPhaseType, standard_workout_session
+
+session = standard_workout_session("Friday Aerobic Class")
+peak = session.phase(WorkoutPhaseType.PEAK)
+print(session.total_duration_minutes, peak.min_energy)
+```
+
+Every session contains warm-up, cardio, peak, and cool-down exactly once in
+that order. Each phase owns duration, BPM range, and energy range constraints.
+The preset values are editable planning defaults, not medical guidance.
 
 ## Repository layout
 

@@ -40,6 +40,26 @@ Backup differs from export: it copies the complete SQLite catalog and is the
 recommended recovery artifact. Test a backup without replacing the active
 catalog using `library search --database PATH`.
 
+## Workout-session model
+
+The engine provides a standard 60-minute blueprint with four ordered phases:
+
+- Warm-up: 10 minutes, 100–120 BPM, energy 3–5
+- Cardio: 25 minutes, 120–140 BPM, energy 5–8
+- Peak: 15 minutes, 135–155 BPM, energy 8–10
+- Cool-down: 10 minutes, 90–115 BPM, energy 2–4
+
+```python
+from aerobictoolkit.playlist import standard_workout_session
+
+session = standard_workout_session("Morning Class")
+print(session.to_dict())
+```
+
+Applications may construct custom `WorkoutPhase` values, but a complete
+`WorkoutSession` always requires each canonical phase once in order. These are
+music-planning defaults and are not medical or exercise-prescription guidance.
+
 ```bash
 python -m aerobictoolkit --version
 python -m aerobictoolkit scan data/input

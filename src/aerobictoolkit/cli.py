@@ -17,6 +17,12 @@ from .analysis import (
     scan_music,
 )
 from .export import write_csv_report, write_json_report
+from .library import (
+    DEFAULT_LIBRARY_PATH,
+    LibraryCatalog,
+    LibraryQuery,
+    index_directory,
+)
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -76,6 +82,52 @@ def build_parser() -> argparse.ArgumentParser:
     _add_energy_options(batch_parser)
     _add_key_option(batch_parser)
     _add_tempo_range_options(batch_parser)
+
+    library_parser = commands.add_parser(
+        "library", help="Build and search the local music catalog."
+    )
+    library_commands = library_parser.add_subparsers(dest="library_command")
+    index_parser = library_commands.add_parser(
+        "index", help="Analyze a directory and update the catalog."
+    )
+    index_parser.add_argument("directory", type=Path)
+    _add_database_option(index_parser)
+    index_parser.add_argument("--no-bpm", action="store_true")
+    index_parser.add_argument("--no-cache", action="store_true")
+    index_parser.add_argument(
+        "--cache", type=Path, default=Path("data/cache/analysis-cache.json")
+    )
+    _add_energy_options(index_parser)
+    _add_key_option(index_parser)
+    _add_tempo_range_options(index_parser)
+
+    search_parser = library_commands.add_parser(
+        "search", help="Search and filter indexed tracks."
+    )
+    search_parser.add_argument("text", nargs="?")
+    _add_database_option(search_parser)
+    search_parser.add_argument("--min-bpm", type=float)
+    search_parser.add_argument("--max-bpm", type=float)
+    search_parser.add_argument("--min-energy", type=int)
+    search_parser.add_argument("--max-energy", type=int)
+    search_parser.add_argument("--camelot")
+    search_parser.add_argument("--mode", choices=("major", "minor"))
+    search_parser.add_argument("--format", dest="file_format")
+    search_parser.add_argument("--tag", action="append", default=[])
+    search_parser.add_argument("--limit", type=int, default=100)
+    search_parser.add_argument("--offset", type=int, default=0)
+    search_parser.add_argument("--json", action="store_true")
+
+    for name, help_text in (
+        ("tag", "Attach tags to an indexed track."),
+        ("untag", "Remove tags from an indexed track."),
+    ):
+        tag_parser = library_commands.add_parser(name, help=help_text)
+        tag_parser.add_argument("path", type=Path)
+        tag_parser.add_argument("tags", nargs="+")
+        _add_database_option(tag_parser)
+    tags_parser = library_commands.add_parser("tags", help="List known tags.")
+    _add_database_option(tags_parser)
     return parser
 
 
@@ -104,6 +156,8 @@ def main() -> int:
                 _print_analysis(result)
         elif args.command == "batch":
             return _run_batch(args)
+        elif args.command == "library":
+            return _run_library(args, parser)
         else:
             parser.print_help()
         return 0
@@ -176,6 +230,85 @@ def _print_batch_summary(
         )
 
 
+def _run_library(args: argparse.Namespace, parser: argparse.ArgumentParser) -> int:
+    if args.library_command == "index":
+        result = index_directory(
+            args.directory,
+            database_path=args.database,
+            include_bpm=not args.no_bpm,
+            include_energy=args.energy,
+            include_key=args.key,
+            cache_path=None if args.no_cache else args.cache,
+            min_bpm=args.min_bpm,
+            max_bpm=args.max_bpm,
+            energy_section_seconds=args.energy_section_seconds,
+        )
+        print(f"Tracks discovered: {result.discovered}")
+        print(f"Indexed: {result.indexed}")
+        print(f"Cache hits: {result.cache_hits}")
+        print(f"Errors: {result.errors}")
+        print(f"Catalog: {args.database}")
+        return 1 if result.errors else 0
+
+    if args.library_command == "search":
+        query = LibraryQuery(
+            text=args.text,
+            min_bpm=args.min_bpm,
+            max_bpm=args.max_bpm,
+            min_energy=args.min_energy,
+            max_energy=args.max_energy,
+            camelot=args.camelot,
+            mode=args.mode,
+            file_format=args.file_format,
+            tags=tuple(args.tag),
+            limit=args.limit,
+            offset=args.offset,
+        )
+        with LibraryCatalog(args.database) as catalog:
+            tracks = catalog.search(query)
+        if args.json:
+            print(
+                json.dumps(
+                    [track.to_dict() for track in tracks],
+                    ensure_ascii=False,
+                    indent=2,
+                )
+            )
+        else:
+            for track in tracks:
+                metrics = [
+                    f"{track.bpm:g} BPM" if track.bpm is not None else "BPM -",
+                    f"energy {track.energy_score}"
+                    if track.energy_score is not None
+                    else "energy -",
+                    track.camelot or "key -",
+                ]
+                tags = f" [{', '.join(track.tags)}]" if track.tags else ""
+                print(f"{track.title} | {' | '.join(metrics)}{tags}")
+                print(f"  {track.path}")
+            print(f"Matches: {len(tracks)}")
+        return 0
+
+    if args.library_command in {"tag", "untag"}:
+        with LibraryCatalog(args.database) as catalog:
+            if args.library_command == "tag":
+                track = catalog.add_tags(args.path, args.tags)
+            else:
+                track = catalog.remove_tags(args.path, args.tags)
+        print(f"Tags for {track.title}: {', '.join(track.tags) or '-'}")
+        return 0
+
+    if args.library_command == "tags":
+        with LibraryCatalog(args.database) as catalog:
+            tags = catalog.list_tags()
+        for name, count in tags:
+            print(f"{name}: {count}")
+        return 0
+
+    parser.parse_args(["library", "--help"])
+    return 0
+
+
 def _add_tempo_range_options(parser: argparse.ArgumentParser) -> None:
     parser.add_argument(
         "--min-bpm",
@@ -210,6 +343,15 @@ def _add_key_option(parser: argparse.ArgumentParser) -> None:
         "--key",
         action="store_true",
         help="Detect musical key and Camelot/Open Key notation.",
+    )
+
+
+def _add_database_option(parser: argparse.ArgumentParser) -> None:
+    parser.add_argument(
+        "--database",
+        type=Path,
+        default=DEFAULT_LIBRARY_PATH,
+        help=f"SQLite catalog path (default: {DEFAULT_LIBRARY_PATH}).",
     )
 
 

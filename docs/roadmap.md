@@ -1,21 +1,20 @@
 # Roadmap
 
-## Current: Sprint 2.7 — Musical Key Analysis
+## Current: Sprint 2.8 — Library Index
 
-The current release adds harmonic metadata for compatible playlist ordering.
+The current release turns analyzed files into reusable local library data.
 
-- [x] Detect all 12 roots in major and minor modes.
-- [x] Publish confidence and low, medium, or high review guidance.
-- [x] Map every result to Camelot and Open Key notation.
-- [x] Suggest same, adjacent, and relative-mode wheel positions.
-- [x] Bound CQT memory with a downsampled 60-second analysis segment.
-- [x] Include key data in cache, JSON, CSV, CLI, and batch workflows.
+- [x] Persist tracks and complete analysis JSON in SQLite.
+- [x] Update existing tracks without duplicating paths or losing tags.
+- [x] Search title, artist, album, and path.
+- [x] Filter by BPM, energy, Camelot key, mode, format, and multiple tags.
+- [x] Add, remove, list, and search case-insensitive tags.
+- [x] Expose the same catalog service through Python and CLI.
 
-## Next: music-library index
+## Next: playlist planning
 
-The next sprint will persist analyzed tracks in a searchable local catalog with
-filtering by BPM, confidence, energy, key, format, and duration. Playlist
-optimization and mix rendering remain later milestones.
+The next sprint will score candidate tracks and build workout-aware ordering
+from BPM, energy, harmonic compatibility, tags, and phase constraints.
 
 ## Delivery rules
 

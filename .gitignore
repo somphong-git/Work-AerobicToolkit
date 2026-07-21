@@ -29,6 +29,8 @@ env/
 !/data/reports/.gitkeep
 /data/cache/*
 !/data/cache/.gitkeep
+/data/library/*
+!/data/library/.gitkeep
 *.aac
 *.flac
 *.m4a

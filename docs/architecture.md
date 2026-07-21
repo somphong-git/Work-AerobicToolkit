@@ -14,6 +14,7 @@ layout establishes stable ownership boundaries before feature development:
 ```text
 src/aerobictoolkit/
 ├── analysis/   Track inspection and derived metrics
+├── library/    Persistent catalog, search, filters, and tags
 ├── audio/      Audio I/O and signal-processing adapters
 ├── playlist/   Playlist domain operations
 ├── mixing/     Mix planning and rendering
@@ -91,6 +92,20 @@ The key adapter uses librosa's 12-bin Constant-Q chromagram and Krumhansl
 major/minor profiles. Keeping the working segment bounded prevents large WAV
 files from exhausting memory while tempo, energy, and key still share the
 original decode operation.
+
+## Library index flow
+
+```text
+Directory -> batch analysis/cache -> LibraryCatalog -> SQLite
+                                              |
+                                              v
+                              search / filters / user tags
+```
+
+Track paths are unique and analysis refreshes use upserts. Tags use separate
+many-to-many tables so re-analysis never overwrites user organization. SQLite
+is a local persistence adapter behind public engine contracts; the CLI is only
+one consumer of those contracts.
 
 ## Dependency direction
 

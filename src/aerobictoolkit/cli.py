@@ -21,6 +21,9 @@ from .library import (
     DEFAULT_LIBRARY_PATH,
     LibraryCatalog,
     LibraryQuery,
+    backup_library,
+    export_library,
+    import_library,
     index_directory,
 )
 
@@ -128,6 +131,21 @@ def build_parser() -> argparse.ArgumentParser:
         _add_database_option(tag_parser)
     tags_parser = library_commands.add_parser("tags", help="List known tags.")
     _add_database_option(tags_parser)
+    export_parser = library_commands.add_parser(
+        "export", help="Export library metadata to JSON or CSV."
+    )
+    export_parser.add_argument("output", type=Path)
+    _add_database_option(export_parser)
+    import_parser = library_commands.add_parser(
+        "import", help="Import library metadata from JSON or CSV."
+    )
+    import_parser.add_argument("input", type=Path)
+    _add_database_option(import_parser)
+    backup_parser = library_commands.add_parser(
+        "backup", help="Create a consistent SQLite catalog backup."
+    )
+    backup_parser.add_argument("output", type=Path)
+    _add_database_option(backup_parser)
     return parser
 
 
@@ -303,6 +321,24 @@ def _run_library(args: argparse.Namespace, parser: argparse.ArgumentParser) -> i
             tags = catalog.list_tags()
         for name, count in tags:
             print(f"{name}: {count}")
+        return 0
+
+    if args.library_command == "export":
+        output = export_library(args.output, database_path=args.database)
+        print(f"Library exported: {output}")
+        return 0
+
+    if args.library_command == "import":
+        result = import_library(args.input, database_path=args.database)
+        print(f"Tracks read: {result.total}")
+        print(f"Imported: {result.imported}")
+        print(f"Updated: {result.updated}")
+        print(f"Catalog: {args.database}")
+        return 0
+
+    if args.library_command == "backup":
+        output = backup_library(args.output, database_path=args.database)
+        print(f"Library backup: {output}")
         return 0
 
     parser.parse_args(["library", "--help"])

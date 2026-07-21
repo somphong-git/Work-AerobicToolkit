@@ -21,6 +21,25 @@ Search supports BPM, energy, Camelot key, mode, format, and repeatable tag
 filters. Multiple tags use AND semantics. Add or remove labels with `library
 tag` and `library untag`; re-indexing updates analysis but preserves labels.
 
+## Import, export, and backup
+
+```powershell
+python -m aerobictoolkit library export data/reports/library.json
+python -m aerobictoolkit library export data/reports/library.csv
+python -m aerobictoolkit library import data/reports/library.json
+python -m aerobictoolkit library backup data/output/catalog-backup.sqlite3
+```
+
+Choose another source or destination catalog with `--database PATH`. Exported
+metadata includes paths, descriptive metadata, searchable analysis values, and
+tags. JSON includes a schema version for machine integrations; CSV uses a BOM
+for Excel and stores tags as a JSON array. Import merges tags and updates a
+track when its resolved path already exists.
+
+Backup differs from export: it copies the complete SQLite catalog and is the
+recommended recovery artifact. Test a backup without replacing the active
+catalog using `library search --database PATH`.
+
 ```bash
 python -m aerobictoolkit --version
 python -m aerobictoolkit scan data/input

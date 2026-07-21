@@ -107,6 +107,19 @@ many-to-many tables so re-analysis never overwrites user organization. SQLite
 is a local persistence adapter behind public engine contracts; the CLI is only
 one consumer of those contracts.
 
+## Library transfer boundary
+
+```text
+LibraryCatalog -> versioned JSON / UTF-8 CSV -> another LibraryCatalog
+       |
+       +------ SQLite online backup -------> recoverable catalog copy
+```
+
+Export formats carry portable metadata and tags, while a backup preserves the
+entire database. Import validates records before passing them through the same
+catalog upsert boundary used by future interfaces. File-format schema versions
+are independent from the internal SQLite schema version.
+
 ## Dependency direction
 
 ```text

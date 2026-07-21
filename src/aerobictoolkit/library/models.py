@@ -65,3 +65,15 @@ class LibraryIndexResult:
 
     def to_dict(self) -> dict[str, int]:
         return asdict(self)
+
+
+@dataclass(frozen=True, slots=True)
+class LibraryImportResult:
+    """Summary of importing portable metadata into a catalog."""
+
+    total: int
+    imported: int
+    updated: int
+
+    def to_dict(self) -> dict[str, int]:
+        return asdict(self)

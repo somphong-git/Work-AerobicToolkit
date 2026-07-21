@@ -4,8 +4,8 @@ Work-AerobicToolkit is an open-source, engine-first foundation for aerobic DJ
 mix workflows. The same core package is intended to support future CLI,
 desktop, web, API, plugin, agent, and mobile interfaces.
 
-> **Project status:** pre-alpha. Sprint 2.3 provides local track metadata and
-> BPM estimation. Playlist generation and mix rendering remain future work.
+> **Project status:** pre-alpha. Sprint 2.5 adds normalized BPM, confidence,
+> and beat-grid timing. Playlist generation and mix rendering remain future work.
 
 ## Installation
 
@@ -37,6 +37,26 @@ python -m aerobictoolkit analyze "data/input/your-track.mp3" --json
 ```
 
 Use `--no-bpm` to inspect metadata only.
+
+Tempo is normalized into 90–180 BPM by default to resolve common half-time and
+double-time estimates. Results also include a confidence score from 0 to 1 and
+the detected beat positions. A custom one-octave range can be supplied:
+
+```powershell
+python -m aerobictoolkit analyze "data/input/your-track.mp3" `
+  --min-bpm 100 --max-bpm 200
+```
+
+Analyze every supported track in a folder and write reusable reports:
+
+```powershell
+python -m aerobictoolkit batch data/input
+```
+
+The default cache is `data/cache/analysis-cache.json`. Reports are written to
+`data/reports/analysis-report.json` and `data/reports/analysis-report.csv`.
+Run the command again to reuse unchanged results, or append `--no-cache` to
+force a fresh analysis.
 
 ## Repository layout
 

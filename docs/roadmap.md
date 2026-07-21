@@ -1,21 +1,22 @@
 # Roadmap
 
-## Current: Sprint 2.3 — Core Audio Analysis
+## Current: Sprint 2.5 — BPM Confidence and Beat Grid
 
-The immediate goal is a reusable, testable audio-analysis boundary for all
-future clients.
+The current release improves tempo reliability before playlist decisions are
+built on top of analysis results.
 
-- [x] Define immutable metadata and analysis result models.
-- [x] Read supported local track metadata and duration.
-- [x] Estimate BPM through an optional audio-analysis adapter.
-- [x] Expose scan and analyze workflows through the CLI.
-- [x] Cover engine behavior with automated tests.
+- [x] Preserve raw BPM and normalize half-time/double-time estimates.
+- [x] Support configurable one-octave tempo ranges.
+- [x] Generate normalized beat positions in seconds.
+- [x] Calculate confidence from regularity, tempo agreement, and beat evidence.
+- [x] Expose low, medium, and high confidence levels.
+- [x] Include tempo details in cache, JSON, CSV, CLI, and batch workflows.
 
-## Next: playlist intelligence sprint
+## Next: energy analysis
 
-The next sprint will begin only after an issue defines a narrow, testable
-outcome. Candidate work includes energy analysis, BPM confidence, and playlist
-optimization. Mix rendering remains explicitly deferred.
+The next sprint will derive perceptual energy and intensity sections for
+warm-up, cardio, peak, and cool-down planning. Musical-key analysis, playlist
+optimization, and mix rendering remain later milestones.
 
 ## Delivery rules
 

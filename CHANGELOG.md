@@ -8,7 +8,17 @@ All notable changes to this project are documented here. This project follows
 
 ### Planned
 
-- Add energy analysis and playlist intelligence.
+- Add BPM confidence and beat-grid analysis.
+
+## [0.4.0] - 2026-07-21
+
+### Added
+
+- Directory-level batch audio analysis with per-track error isolation.
+- Persistent cache with file and analysis-profile invalidation.
+- UTF-8 JSON and Excel-friendly CSV analysis reports.
+- `batch` CLI command with report, cache, and metadata-only options.
+- Cache warnings and machine-readable error details in batch results.
 
 ## [0.3.0] - 2026-07-20
 
@@ -38,6 +48,7 @@ All notable changes to this project are documented here. This project follows
 - Moved local input, output, report, and cache directories under `data/`.
 - Moved the existing music scanner into `src/aerobictoolkit/analysis/`.
 
-[Unreleased]: https://github.com/somphong-git/Work-AerobicToolkit/compare/v0.3.0...HEAD
+[Unreleased]: https://github.com/somphong-git/Work-AerobicToolkit/compare/v0.4.0...HEAD
+[0.4.0]: https://github.com/somphong-git/Work-AerobicToolkit/releases/tag/v0.4.0
 [0.3.0]: https://github.com/somphong-git/Work-AerobicToolkit/releases/tag/v0.3.0
 [0.2.0]: https://github.com/somphong-git/Work-AerobicToolkit/releases/tag/v0.2.0

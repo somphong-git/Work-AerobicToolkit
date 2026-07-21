@@ -4,8 +4,8 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "work-aerobictoolkit"
-version = "0.3.0"
-description = "Audio analysis engine for building aerobic DJ mix workflows."
+version = "0.4.0"
+description = "Batch audio analysis engine for aerobic DJ mix workflows."
 readme = "README.md"
 requires-python = ">=3.12"
 license = "MIT"

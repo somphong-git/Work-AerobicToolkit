@@ -8,7 +8,15 @@ import sys
 from pathlib import Path
 
 from . import __version__
-from .analysis import TrackAnalysis, analyze_track, scan_music
+from .analysis import (
+    AudioAnalysisDependencyError,
+    BatchAnalysisResult,
+    TrackAnalysis,
+    analyze_directory,
+    analyze_track,
+    scan_music,
+)
+from .export import write_csv_report, write_json_report
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -33,23 +41,61 @@ def build_parser() -> argparse.ArgumentParser:
     analyze_parser.add_argument(
         "--json", action="store_true", help="Print the result as JSON."
     )
+
+    batch_parser = commands.add_parser(
+        "batch", help="Analyze a directory and write JSON and CSV reports."
+    )
+    batch_parser.add_argument("directory", type=Path)
+    batch_parser.add_argument(
+        "--no-bpm", action="store_true", help="Read metadata without BPM analysis."
+    )
+    batch_parser.add_argument(
+        "--no-cache", action="store_true", help="Do not read or write the cache."
+    )
+    batch_parser.add_argument(
+        "--cache",
+        type=Path,
+        default=Path("data/cache/analysis-cache.json"),
+        help="Cache file path.",
+    )
+    batch_parser.add_argument(
+        "--json-report",
+        type=Path,
+        default=Path("data/reports/analysis-report.json"),
+        help="JSON report path.",
+    )
+    batch_parser.add_argument(
+        "--csv-report",
+        type=Path,
+        default=Path("data/reports/analysis-report.csv"),
+        help="CSV report path.",
+    )
     return parser
 
 
 def main() -> int:
     """Run the selected command-line adapter."""
     _configure_stdout()
-    args = build_parser().parse_args()
-    if args.command == "scan":
-        for track in scan_music(args.directory):
-            print(track)
-    elif args.command == "analyze":
-        result = analyze_track(args.path, include_bpm=not args.no_bpm)
-        if args.json:
-            print(json.dumps(result.to_dict(), ensure_ascii=False, indent=2))
+    parser = build_parser()
+    args = parser.parse_args()
+    try:
+        if args.command == "scan":
+            for track in scan_music(args.directory):
+                print(track)
+        elif args.command == "analyze":
+            result = analyze_track(args.path, include_bpm=not args.no_bpm)
+            if args.json:
+                print(json.dumps(result.to_dict(), ensure_ascii=False, indent=2))
+            else:
+                _print_analysis(result)
+        elif args.command == "batch":
+            return _run_batch(args)
         else:
-            _print_analysis(result)
-    return 0
+            parser.print_help()
+        return 0
+    except (AudioAnalysisDependencyError, OSError) as error:
+        print(f"Error: {error}", file=sys.stderr)
+        return 2
 
 
 def _print_analysis(result: TrackAnalysis) -> None:
@@ -59,6 +105,38 @@ def _print_analysis(result: TrackAnalysis) -> None:
     print(f"Artist: {metadata.artist or '-'}")
     print(f"Duration: {metadata.duration_seconds or '-'} seconds")
     print(f"BPM: {result.bpm or '-'}")
+
+
+def _run_batch(args: argparse.Namespace) -> int:
+    cache_path = None if args.no_cache else args.cache
+    result = analyze_directory(
+        args.directory,
+        include_bpm=not args.no_bpm,
+        cache_path=cache_path,
+    )
+    json_path = write_json_report(result, args.json_report)
+    csv_path = write_csv_report(result, args.csv_report)
+    _print_batch_summary(result, json_path=json_path, csv_path=csv_path)
+    return 1 if result.errors else 0
+
+
+def _print_batch_summary(
+    result: BatchAnalysisResult, *, json_path: Path, csv_path: Path
+) -> None:
+    print(f"Tracks found: {result.total_count}")
+    print(f"Successful: {result.success_count}")
+    print(f"Analyzed now: {result.analyzed_count}")
+    print(f"Cache hits: {result.cache_hit_count}")
+    print(f"Errors: {result.error_count}")
+    print(f"JSON report: {json_path}")
+    print(f"CSV report: {csv_path}")
+    for warning in result.cache_warnings:
+        print(f"Cache warning: {warning}", file=sys.stderr)
+    for error in result.errors:
+        print(
+            f"Failed: {error.path} ({error.error_type}: {error.message})",
+            file=sys.stderr,
+        )
 
 
 def _configure_stdout() -> None:

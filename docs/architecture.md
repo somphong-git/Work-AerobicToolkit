@@ -35,6 +35,19 @@ src/aerobictoolkit/
    requires them.
 5. Public contracts are documented and tested before adding another interface.
 
+## Batch analysis flow
+
+```text
+Directory scanner -> cache lookup -> track analyzer -> batch result
+                                             |              |
+                                             v              v
+                                      isolated errors   JSON / CSV
+```
+
+The cache fingerprints each source file by absolute path, size, modification
+time, and analysis profile. Cache failures become warnings; track failures are
+captured individually so one damaged file does not stop the directory job.
+
 ## Dependency direction
 
 ```text

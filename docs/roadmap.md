@@ -1,21 +1,21 @@
 # Roadmap
 
-## Current: Sprint 2.3 — Core Audio Analysis
+## Current: Sprint 2.4 — Batch Analysis and Cache
 
-The immediate goal is a reusable, testable audio-analysis boundary for all
-future clients.
+The current release makes core analysis practical for a local music library.
 
-- [x] Define immutable metadata and analysis result models.
-- [x] Read supported local track metadata and duration.
-- [x] Estimate BPM through an optional audio-analysis adapter.
-- [x] Expose scan and analyze workflows through the CLI.
-- [x] Cover engine behavior with automated tests.
+- [x] Analyze every supported track in a directory.
+- [x] Reuse unchanged results from a persistent cache.
+- [x] Invalidate cache entries when a file or analysis profile changes.
+- [x] Continue after per-track decoder or analysis failures.
+- [x] Export complete UTF-8 JSON and Excel-friendly CSV reports.
+- [x] Expose the workflow through a production-facing CLI command.
 
-## Next: playlist intelligence sprint
+## Next: BPM confidence and beat-grid analysis
 
-The next sprint will begin only after an issue defines a narrow, testable
-outcome. Candidate work includes energy analysis, BPM confidence, and playlist
-optimization. Mix rendering remains explicitly deferred.
+The next sprint will improve tempo reliability with confidence information,
+tempo-range normalization, and beat timing. Energy analysis, playlist
+optimization, and mix rendering remain later milestones.
 
 ## Delivery rules
 

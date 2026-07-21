@@ -6,6 +6,21 @@ This release can scan local tracks, normalize BPM, grade tempo and key
 confidence, produce beat and energy timelines, and analyze a whole directory
 with persistent caching. It is not yet a finished DJ-mixing product.
 
+## Local music library
+
+Build the full analysis catalog or use `--no-bpm` for a fast metadata-only
+index:
+
+```powershell
+python -m aerobictoolkit library index data/input --energy --key
+python -m aerobictoolkit library search "dance" --min-bpm 125 --tag cardio
+python -m aerobictoolkit library search --mode minor --camelot 8A --json
+```
+
+Search supports BPM, energy, Camelot key, mode, format, and repeatable tag
+filters. Multiple tags use AND semantics. Add or remove labels with `library
+tag` and `library untag`; re-indexing updates analysis but preserves labels.
+
 ```bash
 python -m aerobictoolkit --version
 python -m aerobictoolkit scan data/input

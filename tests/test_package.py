@@ -5,7 +5,7 @@ from aerobictoolkit.cli import _configure_stdout, build_parser
 
 
 def test_package_has_version():
-    assert __version__ == "0.7.0"
+    assert __version__ == "0.8.0"
 
 
 def test_cli_parser_accepts_version():
@@ -42,6 +42,39 @@ def test_cli_parser_accepts_musical_key_option():
     args = build_parser().parse_args(["analyze", "track.wav", "--key"])
 
     assert args.key is True
+
+
+def test_cli_parser_accepts_library_index_options():
+    args = build_parser().parse_args(
+        ["library", "index", "data/input", "--no-bpm", "--energy", "--key"]
+    )
+
+    assert args.command == "library"
+    assert args.library_command == "index"
+    assert args.no_bpm is True
+    assert args.energy is True
+    assert args.key is True
+
+
+def test_cli_parser_accepts_library_search_filters():
+    args = build_parser().parse_args(
+        [
+            "library",
+            "search",
+            "warmup",
+            "--min-bpm",
+            "120",
+            "--max-energy",
+            "8",
+            "--tag",
+            "cardio",
+        ]
+    )
+
+    assert args.text == "warmup"
+    assert args.min_bpm == 120.0
+    assert args.max_energy == 8
+    assert args.tag == ["cardio"]
 
 
 def test_configure_stdout_handles_streams_without_reconfigure(

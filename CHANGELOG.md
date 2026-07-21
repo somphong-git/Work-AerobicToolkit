@@ -8,7 +8,21 @@ All notable changes to this project are documented here. This project follows
 
 ### Planned
 
-- Add a persistent, searchable local music-library index.
+- Add playlist scoring and automatic workout ordering.
+
+## [0.8.0] - 2026-07-21
+
+### Added
+
+- Persistent SQLite music catalog with unique path-based track upserts.
+- Text search and filters for BPM, energy, key, mode, format, and tags.
+- Case-insensitive many-to-many tags that survive track re-indexing.
+- `library index`, `search`, `tag`, `untag`, and `tags` CLI commands.
+- Public `LibraryCatalog`, `LibraryQuery`, and `index_directory` engine APIs.
+
+### Changed
+
+- Added `data/library/` as ignored durable local application data.
 
 ## [0.7.0] - 2026-07-21
 
@@ -91,7 +105,8 @@ All notable changes to this project are documented here. This project follows
 - Moved local input, output, report, and cache directories under `data/`.
 - Moved the existing music scanner into `src/aerobictoolkit/analysis/`.
 
-[Unreleased]: https://github.com/somphong-git/Work-AerobicToolkit/compare/v0.7.0...HEAD
+[Unreleased]: https://github.com/somphong-git/Work-AerobicToolkit/compare/v0.8.0...HEAD
+[0.8.0]: https://github.com/somphong-git/Work-AerobicToolkit/releases/tag/v0.8.0
 [0.7.0]: https://github.com/somphong-git/Work-AerobicToolkit/releases/tag/v0.7.0
 [0.6.0]: https://github.com/somphong-git/Work-AerobicToolkit/releases/tag/v0.6.0
 [0.5.0]: https://github.com/somphong-git/Work-AerobicToolkit/releases/tag/v0.5.0

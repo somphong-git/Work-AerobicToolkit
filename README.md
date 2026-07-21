@@ -4,9 +4,9 @@ Work-AerobicToolkit is an open-source, engine-first foundation for aerobic DJ
 mix workflows. The same core package is intended to support future CLI,
 desktop, web, API, plugin, agent, and mobile interfaces.
 
-> **Project status:** pre-alpha. Sprint 2.7 adds musical-key detection with
-> Camelot and Open Key notation. Playlist generation and mix rendering remain
-> future work.
+> **Project status:** pre-alpha. Sprint 2.8 adds a persistent, searchable local
+> music catalog with filters and tags. Playlist generation and mix rendering
+> remain future work.
 
 ## Installation
 
@@ -80,6 +80,29 @@ The default cache is `data/cache/analysis-cache.json`. Reports are written to
 Run the command again to reuse unchanged results, or append `--no-cache` to
 force a fresh analysis.
 
+## Build and search the music library
+
+Index a folder into the local SQLite catalog. Add `--energy` and `--key` when
+those fields should also be available as search filters:
+
+```powershell
+python -m aerobictoolkit library index data/input --energy --key
+python -m aerobictoolkit library search "warmup" --min-bpm 120 --max-bpm 135
+python -m aerobictoolkit library search --min-energy 7 --camelot 8A --json
+```
+
+Tags remain attached when a track is indexed again:
+
+```powershell
+python -m aerobictoolkit library tag "data/input/your-track.mp3" warmup cardio
+python -m aerobictoolkit library search --tag warmup
+python -m aerobictoolkit library untag "data/input/your-track.mp3" warmup
+python -m aerobictoolkit library tags
+```
+
+The default catalog is `data/library/catalog.sqlite3`. Use `--database PATH`
+to select another catalog. For a quick metadata-only catalog, use `--no-bpm`.
+
 ## Repository layout
 
 ```text
@@ -87,7 +110,7 @@ src/aerobictoolkit/  Reusable package and future engine modules
 tests/               Automated test suite
 examples/            Small runnable usage examples
 docs/                Architecture, guides, roadmap, and ADRs
-data/                Ignored local input, output, reports, and cache data
+data/                Ignored local input, reports, cache, and library data
 scripts/             Build, lint, formatting, release, and documentation tools
 ```
 

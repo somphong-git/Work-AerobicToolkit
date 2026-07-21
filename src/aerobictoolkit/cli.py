@@ -26,6 +26,11 @@ from .library import (
     import_library,
     index_directory,
 )
+from .playlist import (
+    PlaylistGenerationRules,
+    generate_playlist_from_catalog,
+    standard_workout_session,
+)
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -146,6 +151,20 @@ def build_parser() -> argparse.ArgumentParser:
     )
     backup_parser.add_argument("output", type=Path)
     _add_database_option(backup_parser)
+
+    playlist_parser = commands.add_parser(
+        "playlist", help="Generate a workout playlist from the music library."
+    )
+    playlist_commands = playlist_parser.add_subparsers(dest="playlist_command")
+    generate_parser = playlist_commands.add_parser(
+        "generate", help="Build a rule-based four-phase playlist."
+    )
+    generate_parser.add_argument(
+        "--name", default="60-Minute Aerobic Workout", help="Session name."
+    )
+    _add_database_option(generate_parser)
+    generate_parser.add_argument("--duration-tolerance-seconds", type=int, default=120)
+    generate_parser.add_argument("--output", type=Path)
     return parser
 
 
@@ -176,6 +195,8 @@ def main() -> int:
             return _run_batch(args)
         elif args.command == "library":
             return _run_library(args, parser)
+        elif args.command == "playlist":
+            return _run_playlist(args, parser)
         else:
             parser.print_help()
         return 0
@@ -343,6 +364,43 @@ def _run_library(args: argparse.Namespace, parser: argparse.ArgumentParser) -> i
 
     parser.parse_args(["library", "--help"])
     return 0
+
+
+def _run_playlist(args: argparse.Namespace, parser: argparse.ArgumentParser) -> int:
+    if args.playlist_command != "generate":
+        parser.parse_args(["playlist", "--help"])
+        return 0
+    session = standard_workout_session(args.name)
+    rules = PlaylistGenerationRules(
+        duration_tolerance_seconds=args.duration_tolerance_seconds
+    )
+    result = generate_playlist_from_catalog(
+        session, database_path=str(args.database), rules=rules
+    )
+    if args.output:
+        output = args.output.expanduser().resolve()
+        output.parent.mkdir(parents=True, exist_ok=True)
+        output.write_text(
+            json.dumps(result.to_dict(), ensure_ascii=False, indent=2),
+            encoding="utf-8",
+        )
+        print(f"Playlist report: {output}")
+    else:
+        for phase in result.phases:
+            print(
+                f"{phase.target.phase_type.value}: {len(phase.items)} tracks, "
+                f"{phase.actual_duration_seconds / 60:.1f} / "
+                f"{phase.target.target_duration_minutes:g} minutes"
+            )
+            for item in phase.items:
+                print(
+                    f"  {item.track.title} | {item.track.bpm:g} BPM | "
+                    f"energy {item.track.energy_score} | score {item.score.total:g}"
+                )
+        print(f"Complete: {'yes' if result.is_complete else 'no'}")
+        for warning in result.warnings:
+            print(f"Warning: {warning}", file=sys.stderr)
+    return 0 if result.is_complete else 1
 
 
 def _add_tempo_range_options(parser: argparse.ArgumentParser) -> None:

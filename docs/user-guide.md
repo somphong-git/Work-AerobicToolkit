@@ -60,6 +60,29 @@ Applications may construct custom `WorkoutPhase` values, but a complete
 `WorkoutSession` always requires each canonical phase once in order. These are
 music-planning defaults and are not medical or exercise-prescription guidance.
 
+## Rule-based playlist generation
+
+First ensure the library contains BPM and energy analysis, then generate:
+
+```powershell
+python -m aerobictoolkit library index data/input --energy
+python -m aerobictoolkit playlist generate
+python -m aerobictoolkit playlist generate `
+  --database data/library/catalog.sqlite3 `
+  --duration-tolerance-seconds 90 `
+  --output data/reports/workout-playlist.json
+```
+
+Each phase accepts only tracks inside its BPM and energy envelope. Eligible
+tracks receive an explainable weighted score: BPM 45%, energy 35%, and fit to
+the remaining phase duration 20%. Phases with fewer candidates allocate first,
+then output returns to warm-up, cardio, peak, cool-down order. A track is never
+used twice.
+
+The command exits with status 1 when any phase misses its target beyond the
+tolerance. The report remains usable and lists each shortfall; this is expected
+when the analyzed catalog is too small or lacks suitable intensity ranges.
+
 ```bash
 python -m aerobictoolkit --version
 python -m aerobictoolkit scan data/input

@@ -4,8 +4,8 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "work-aerobictoolkit"
-version = "1.0.0"
-description = "Workout-session, audio-analysis, and music-library engine."
+version = "1.1.0"
+description = "Workout playlist, audio-analysis, and music-library engine."
 readme = "README.md"
 requires-python = ">=3.12"
 license = "MIT"

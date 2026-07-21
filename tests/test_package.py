@@ -5,7 +5,7 @@ from aerobictoolkit.cli import _configure_stdout, build_parser
 
 
 def test_package_has_version():
-    assert __version__ == "1.0.0"
+    assert __version__ == "1.1.0"
 
 
 def test_cli_parser_accepts_version():
@@ -85,6 +85,25 @@ def test_cli_parser_accepts_library_transfer_commands(command: str):
 
     assert args.library_command == command
     assert args.database.name == "catalog.db"
+
+
+def test_cli_parser_accepts_playlist_generation_options():
+    args = build_parser().parse_args(
+        [
+            "playlist",
+            "generate",
+            "--database",
+            "catalog.db",
+            "--duration-tolerance-seconds",
+            "60",
+            "--output",
+            "playlist.json",
+        ]
+    )
+
+    assert args.playlist_command == "generate"
+    assert args.duration_tolerance_seconds == 60
+    assert args.output.name == "playlist.json"
 
 
 def test_configure_stdout_handles_streams_without_reconfigure(

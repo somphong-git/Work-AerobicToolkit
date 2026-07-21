@@ -8,7 +8,18 @@ All notable changes to this project are documented here. This project follows
 
 ### Planned
 
-- Add playlist scoring and automatic workout ordering.
+- Add harmonic ordering and transition planning.
+
+## [1.1.0] - 2026-07-21
+
+### Added
+
+- Deterministic rule-based playlist generation from library tracks.
+- BPM, energy, and duration-fit component scores for every selected track.
+- Scarcity-first phase allocation that prevents track reuse and phase starvation.
+- Intensity-aware ordering and continuous session timeline positions.
+- Duration tolerance, completeness, shortfall warnings, and JSON output.
+- `playlist generate` CLI command and catalog-backed Python API.
 
 ## [1.0.0] - 2026-07-21
 
@@ -129,7 +140,8 @@ All notable changes to this project are documented here. This project follows
 - Moved local input, output, report, and cache directories under `data/`.
 - Moved the existing music scanner into `src/aerobictoolkit/analysis/`.
 
-[Unreleased]: https://github.com/somphong-git/Work-AerobicToolkit/compare/v1.0.0...HEAD
+[Unreleased]: https://github.com/somphong-git/Work-AerobicToolkit/compare/v1.1.0...HEAD
+[1.1.0]: https://github.com/somphong-git/Work-AerobicToolkit/releases/tag/v1.1.0
 [1.0.0]: https://github.com/somphong-git/Work-AerobicToolkit/releases/tag/v1.0.0
 [0.9.0]: https://github.com/somphong-git/Work-AerobicToolkit/releases/tag/v0.9.0
 [0.8.0]: https://github.com/somphong-git/Work-AerobicToolkit/releases/tag/v0.8.0

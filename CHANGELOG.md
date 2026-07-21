@@ -8,7 +8,22 @@ All notable changes to this project are documented here. This project follows
 
 ### Planned
 
-- Add perceptual energy and intensity-section analysis.
+- Add musical-key and harmonic-compatibility analysis.
+
+## [0.6.0] - 2026-07-21
+
+### Added
+
+- Explainable perceptual energy score from 1–10 and descriptive levels.
+- Configurable energy timeline sections that default to 15 seconds.
+- RMS loudness, onset activity, and spectral-brightness component metrics.
+- `--energy` and `--energy-section-seconds` options for analyze and batch CLI.
+- Energy values and sections in cache, JSON, and CSV reports.
+
+### Changed
+
+- Tempo and energy analysis now share a single audio decode operation.
+- Upgraded the analysis cache schema for energy-aware profiles.
 
 ## [0.5.0] - 2026-07-21
 
@@ -61,7 +76,8 @@ All notable changes to this project are documented here. This project follows
 - Moved local input, output, report, and cache directories under `data/`.
 - Moved the existing music scanner into `src/aerobictoolkit/analysis/`.
 
-[Unreleased]: https://github.com/somphong-git/Work-AerobicToolkit/compare/v0.5.0...HEAD
+[Unreleased]: https://github.com/somphong-git/Work-AerobicToolkit/compare/v0.6.0...HEAD
+[0.6.0]: https://github.com/somphong-git/Work-AerobicToolkit/releases/tag/v0.6.0
 [0.5.0]: https://github.com/somphong-git/Work-AerobicToolkit/releases/tag/v0.5.0
 [0.4.0]: https://github.com/somphong-git/Work-AerobicToolkit/releases/tag/v0.4.0
 [0.3.0]: https://github.com/somphong-git/Work-AerobicToolkit/releases/tag/v0.3.0

@@ -4,8 +4,8 @@ Work-AerobicToolkit is an open-source, engine-first foundation for aerobic DJ
 mix workflows. The same core package is intended to support future CLI,
 desktop, web, API, plugin, agent, and mobile interfaces.
 
-> **Project status:** pre-alpha. Sprint 2.5 adds normalized BPM, confidence,
-> and beat-grid timing. Playlist generation and mix rendering remain future work.
+> **Project status:** pre-alpha. Sprint 2.6 adds perceptual energy scores and
+> section timelines. Playlist generation and mix rendering remain future work.
 
 ## Installation
 
@@ -46,6 +46,17 @@ the detected beat positions. A custom one-octave range can be supplied:
 python -m aerobictoolkit analyze "data/input/your-track.mp3" `
   --min-bpm 100 --max-bpm 200
 ```
+
+Request energy analysis explicitly to receive an overall score from 1–10 and a
+15-second timeline:
+
+```powershell
+python -m aerobictoolkit analyze "data/input/your-track.mp3" --energy
+python -m aerobictoolkit batch data/input --energy
+```
+
+Use `--energy-section-seconds 10` to change the timeline resolution. Energy is
+opt-in so existing metadata and BPM workflows keep their previous performance.
 
 Analyze every supported track in a folder and write reusable reports:
 

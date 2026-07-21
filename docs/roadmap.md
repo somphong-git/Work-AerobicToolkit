@@ -1,22 +1,22 @@
 # Roadmap
 
-## Current: Sprint 2.5 — BPM Confidence and Beat Grid
+## Current: Sprint 2.6 — Energy Analysis
 
-The current release improves tempo reliability before playlist decisions are
-built on top of analysis results.
+The current release adds perceptual intensity information for aerobic session
+planning.
 
-- [x] Preserve raw BPM and normalize half-time/double-time estimates.
-- [x] Support configurable one-octave tempo ranges.
-- [x] Generate normalized beat positions in seconds.
-- [x] Calculate confidence from regularity, tempo agreement, and beat evidence.
-- [x] Expose low, medium, and high confidence levels.
-- [x] Include tempo details in cache, JSON, CSV, CLI, and batch workflows.
+- [x] Calculate an explainable overall energy score from 1–10.
+- [x] Classify very-low, low, moderate, high, and peak energy.
+- [x] Generate configurable energy sections that default to 15 seconds.
+- [x] Decode audio once when BPM and energy are requested together.
+- [x] Include energy in cache, JSON, CSV, CLI, and batch workflows.
+- [x] Keep energy opt-in for backward-compatible runtime performance.
 
-## Next: energy analysis
+## Next: musical-key analysis
 
-The next sprint will derive perceptual energy and intensity sections for
-warm-up, cardio, peak, and cool-down planning. Musical-key analysis, playlist
-optimization, and mix rendering remain later milestones.
+The next sprint will detect musical key and expose Camelot/Open Key values for
+harmonic playlist ordering. Library indexing, playlist optimization, and mix
+rendering remain later milestones.
 
 ## Delivery rules
 

@@ -63,6 +63,18 @@ Raw detector output is retained alongside normalized BPM. Confidence combines
 beat-grid regularity, frame-level tempo agreement, and evidence size. These are
 engine values, so every future interface receives the same interpretation.
 
+## Energy analysis flow
+
+```text
+Decoded audio -> RMS loudness (55%)
+              -> onset activity (30%)  -> score 1–10 -> section timeline
+              -> spectral brightness (15%)
+```
+
+Tempo and energy share one decoded mono signal when requested together. Energy
+is opt-in and uses calibrated signal heuristics rather than LUFS. The engine
+publishes the component metrics so later calibration remains explainable.
+
 ## Dependency direction
 
 ```text

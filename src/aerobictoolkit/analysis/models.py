@@ -35,6 +35,7 @@ class TrackAnalysis:
     raw_bpm: float | None = None
     bpm_confidence: float | None = None
     beat_grid: BeatGrid | None = None
+    energy: EnergyAnalysis | None = None
 
     def to_dict(self) -> dict[str, object]:
         """Return a JSON-friendly representation of the analysis result."""
@@ -45,6 +46,7 @@ class TrackAnalysis:
             "bpm_confidence": self.bpm_confidence,
             "confidence_level": self.confidence_level,
             "beat_grid": self.beat_grid.to_dict() if self.beat_grid else None,
+            "energy": self.energy.to_dict() if self.energy else None,
         }
 
     @property
@@ -89,6 +91,71 @@ class TempoAnalysis:
     normalized_bpm: float
     confidence: float
     beat_grid: BeatGrid
+
+
+@dataclass(frozen=True, slots=True)
+class EnergySection:
+    """Energy score for one contiguous time range."""
+
+    start_seconds: float
+    end_seconds: float
+    score: int
+
+    @property
+    def level(self) -> str:
+        return energy_level(self.score)
+
+    def to_dict(self) -> dict[str, object]:
+        return {
+            "start_seconds": self.start_seconds,
+            "end_seconds": self.end_seconds,
+            "score": self.score,
+            "level": self.level,
+        }
+
+
+@dataclass(frozen=True, slots=True)
+class EnergyAnalysis:
+    """Overall perceptual energy and its timeline."""
+
+    score: int
+    rms_db: float
+    onset_rate: float
+    brightness: float
+    section_seconds: float
+    sections: tuple[EnergySection, ...]
+
+    @property
+    def level(self) -> str:
+        return energy_level(self.score)
+
+    def to_dict(self) -> dict[str, object]:
+        return {
+            "score": self.score,
+            "level": self.level,
+            "metrics": {
+                "rms_db": self.rms_db,
+                "onset_rate": self.onset_rate,
+                "brightness": self.brightness,
+            },
+            "section_seconds": self.section_seconds,
+            "sections": [section.to_dict() for section in self.sections],
+        }
+
+
+def energy_level(score: int) -> str:
+    """Map an energy score from 1–10 to a stable descriptive level."""
+    if not 1 <= score <= 10:
+        raise ValueError("Energy score must be between 1 and 10.")
+    if score <= 2:
+        return "very-low"
+    if score <= 4:
+        return "low"
+    if score <= 6:
+        return "moderate"
+    if score <= 8:
+        return "high"
+    return "peak"
 
 
 @dataclass(frozen=True, slots=True)

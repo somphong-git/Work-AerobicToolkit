@@ -41,6 +41,7 @@ def build_parser() -> argparse.ArgumentParser:
     analyze_parser.add_argument(
         "--json", action="store_true", help="Print the result as JSON."
     )
+    _add_energy_options(analyze_parser)
     _add_tempo_range_options(analyze_parser)
 
     batch_parser = commands.add_parser(
@@ -71,6 +72,7 @@ def build_parser() -> argparse.ArgumentParser:
         default=Path("data/reports/analysis-report.csv"),
         help="CSV report path.",
     )
+    _add_energy_options(batch_parser)
     _add_tempo_range_options(batch_parser)
     return parser
 
@@ -88,8 +90,10 @@ def main() -> int:
             result = analyze_track(
                 args.path,
                 include_bpm=not args.no_bpm,
+                include_energy=args.energy,
                 min_bpm=args.min_bpm,
                 max_bpm=args.max_bpm,
+                energy_section_seconds=args.energy_section_seconds,
             )
             if args.json:
                 print(json.dumps(result.to_dict(), ensure_ascii=False, indent=2))
@@ -117,6 +121,13 @@ def _print_analysis(result: TrackAnalysis) -> None:
     print(f"Confidence: {confidence if confidence is not None else '-'}")
     print(f"Confidence level: {result.confidence_level or '-'}")
     print(f"Beats detected: {result.beat_grid.beat_count if result.beat_grid else 0}")
+    if result.energy:
+        section_scores = [section.score for section in result.energy.sections]
+        print(f"Energy: {result.energy.score}/10 ({result.energy.level})")
+        print(
+            f"Energy sections: {len(section_scores)} "
+            f"(range {min(section_scores)}-{max(section_scores)})"
+        )
 
 
 def _run_batch(args: argparse.Namespace) -> int:
@@ -124,9 +135,11 @@ def _run_batch(args: argparse.Namespace) -> int:
     result = analyze_directory(
         args.directory,
         include_bpm=not args.no_bpm,
+        include_energy=args.energy,
         cache_path=cache_path,
         min_bpm=args.min_bpm,
         max_bpm=args.max_bpm,
+        energy_section_seconds=args.energy_section_seconds,
     )
     json_path = write_json_report(result, args.json_report)
     csv_path = write_csv_report(result, args.csv_report)
@@ -165,6 +178,20 @@ def _add_tempo_range_options(parser: argparse.ArgumentParser) -> None:
         type=float,
         default=180.0,
         help="Upper bound for octave-normalized BPM (default: 180).",
+    )
+
+
+def _add_energy_options(parser: argparse.ArgumentParser) -> None:
+    parser.add_argument(
+        "--energy",
+        action="store_true",
+        help="Calculate an energy score and section timeline.",
+    )
+    parser.add_argument(
+        "--energy-section-seconds",
+        type=float,
+        default=15.0,
+        help="Length of each energy timeline section (default: 15 seconds).",
     )
 
 

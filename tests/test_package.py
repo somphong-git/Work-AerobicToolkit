@@ -5,7 +5,7 @@ from aerobictoolkit.cli import _configure_stdout, build_parser
 
 
 def test_package_has_version():
-    assert __version__ == "0.5.0"
+    assert __version__ == "0.6.0"
 
 
 def test_cli_parser_accepts_version():
@@ -27,6 +27,15 @@ def test_cli_parser_accepts_tempo_normalization_range():
 
     assert args.min_bpm == 100.0
     assert args.max_bpm == 200.0
+
+
+def test_cli_parser_accepts_energy_timeline_options():
+    args = build_parser().parse_args(
+        ["analyze", "track.wav", "--energy", "--energy-section-seconds", "10"]
+    )
+
+    assert args.energy is True
+    assert args.energy_section_seconds == 10.0
 
 
 def test_configure_stdout_handles_streams_without_reconfigure(

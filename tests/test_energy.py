@@ -13,6 +13,7 @@ from aerobictoolkit.analysis.models import (
     BeatGrid,
     EnergyAnalysis,
     EnergySection,
+    MusicalKeyAnalysis,
     TempoAnalysis,
     TrackAnalysis,
     TrackMetadata,
@@ -103,6 +104,15 @@ def test_track_analysis_decodes_once_for_tempo_and_energy(
 
     tempo = TempoAnalysis(120.0, 120.0, 0.9, BeatGrid((0.0, 0.5)))
     energy = EnergyAnalysis(6, -15.0, 2.0, 0.2, 15.0, (EnergySection(0.0, 10.0, 6),))
+    musical_key = MusicalKeyAnalysis(
+        "C",
+        "major",
+        "8B",
+        "1d",
+        0.9,
+        ("8B", "7B", "9B", "8A"),
+        ("1d", "12d", "2d", "1m"),
+    )
     monkeypatch.setattr(
         "aerobictoolkit.analysis.service.read_track_metadata", lambda path: metadata
     )
@@ -115,12 +125,19 @@ def test_track_analysis_decodes_once_for_tempo_and_energy(
         "aerobictoolkit.analysis.service.analyze_energy_samples",
         lambda *args, **kwargs: energy,
     )
+    monkeypatch.setattr(
+        "aerobictoolkit.analysis.service.analyze_key_samples",
+        lambda *args, **kwargs: musical_key,
+    )
 
-    result = analyze_track(track, include_bpm=True, include_energy=True)
+    result = analyze_track(
+        track, include_bpm=True, include_energy=True, include_key=True
+    )
 
     assert load_count == 1
     assert result.bpm == 120.0
     assert result.energy is energy
+    assert result.musical_key is musical_key
 
 
 def test_energy_round_trips_through_analysis_cache(tmp_path: Path) -> None:
@@ -135,6 +152,7 @@ def test_energy_round_trips_through_analysis_cache(tmp_path: Path) -> None:
         analysis,
         include_bpm=False,
         include_energy=True,
+        include_key=False,
         min_bpm=90.0,
         max_bpm=180.0,
         energy_section_seconds=15.0,
@@ -145,6 +163,7 @@ def test_energy_round_trips_through_analysis_cache(tmp_path: Path) -> None:
         track,
         include_bpm=False,
         include_energy=True,
+        include_key=False,
         min_bpm=90.0,
         max_bpm=180.0,
         energy_section_seconds=15.0,

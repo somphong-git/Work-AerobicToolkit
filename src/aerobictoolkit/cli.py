@@ -42,6 +42,7 @@ def build_parser() -> argparse.ArgumentParser:
         "--json", action="store_true", help="Print the result as JSON."
     )
     _add_energy_options(analyze_parser)
+    _add_key_option(analyze_parser)
     _add_tempo_range_options(analyze_parser)
 
     batch_parser = commands.add_parser(
@@ -73,6 +74,7 @@ def build_parser() -> argparse.ArgumentParser:
         help="CSV report path.",
     )
     _add_energy_options(batch_parser)
+    _add_key_option(batch_parser)
     _add_tempo_range_options(batch_parser)
     return parser
 
@@ -91,6 +93,7 @@ def main() -> int:
                 args.path,
                 include_bpm=not args.no_bpm,
                 include_energy=args.energy,
+                include_key=args.key,
                 min_bpm=args.min_bpm,
                 max_bpm=args.max_bpm,
                 energy_section_seconds=args.energy_section_seconds,
@@ -128,6 +131,12 @@ def _print_analysis(result: TrackAnalysis) -> None:
             f"Energy sections: {len(section_scores)} "
             f"(range {min(section_scores)}-{max(section_scores)})"
         )
+    if result.musical_key:
+        key = result.musical_key
+        print(f"Key: {key.name}")
+        print(f"Camelot / Open Key: {key.camelot} / {key.open_key}")
+        print(f"Key confidence: {key.confidence} ({key.confidence_level})")
+        print(f"Compatible Camelot: {', '.join(key.compatible_camelot)}")
 
 
 def _run_batch(args: argparse.Namespace) -> int:
@@ -136,6 +145,7 @@ def _run_batch(args: argparse.Namespace) -> int:
         args.directory,
         include_bpm=not args.no_bpm,
         include_energy=args.energy,
+        include_key=args.key,
         cache_path=cache_path,
         min_bpm=args.min_bpm,
         max_bpm=args.max_bpm,
@@ -192,6 +202,14 @@ def _add_energy_options(parser: argparse.ArgumentParser) -> None:
         type=float,
         default=15.0,
         help="Length of each energy timeline section (default: 15 seconds).",
+    )
+
+
+def _add_key_option(parser: argparse.ArgumentParser) -> None:
+    parser.add_argument(
+        "--key",
+        action="store_true",
+        help="Detect musical key and Camelot/Open Key notation.",
     )
 
 

@@ -31,6 +31,14 @@ CSV_FIELDS = (
     "energy_onset_rate",
     "energy_brightness",
     "energy_sections",
+    "musical_key",
+    "key_mode",
+    "camelot",
+    "open_key",
+    "key_confidence",
+    "key_confidence_level",
+    "compatible_camelot",
+    "compatible_open_key",
     "error_type",
     "error_message",
 )
@@ -108,6 +116,46 @@ def write_csv_report(result: BatchAnalysisResult, path: str | Path) -> Path:
                         if item.analysis.energy
                         else ""
                     ),
+                    "musical_key": (
+                        item.analysis.musical_key.name
+                        if item.analysis.musical_key
+                        else ""
+                    ),
+                    "key_mode": (
+                        item.analysis.musical_key.mode
+                        if item.analysis.musical_key
+                        else ""
+                    ),
+                    "camelot": (
+                        item.analysis.musical_key.camelot
+                        if item.analysis.musical_key
+                        else ""
+                    ),
+                    "open_key": (
+                        item.analysis.musical_key.open_key
+                        if item.analysis.musical_key
+                        else ""
+                    ),
+                    "key_confidence": (
+                        item.analysis.musical_key.confidence
+                        if item.analysis.musical_key
+                        else ""
+                    ),
+                    "key_confidence_level": (
+                        item.analysis.musical_key.confidence_level
+                        if item.analysis.musical_key
+                        else ""
+                    ),
+                    "compatible_camelot": (
+                        json.dumps(item.analysis.musical_key.compatible_camelot)
+                        if item.analysis.musical_key
+                        else ""
+                    ),
+                    "compatible_open_key": (
+                        json.dumps(item.analysis.musical_key.compatible_open_key)
+                        if item.analysis.musical_key
+                        else ""
+                    ),
                     "error_type": "",
                     "error_message": "",
                 }
@@ -137,6 +185,14 @@ def write_csv_report(result: BatchAnalysisResult, path: str | Path) -> Path:
                     "energy_onset_rate": "",
                     "energy_brightness": "",
                     "energy_sections": "",
+                    "musical_key": "",
+                    "key_mode": "",
+                    "camelot": "",
+                    "open_key": "",
+                    "key_confidence": "",
+                    "key_confidence_level": "",
+                    "compatible_camelot": "",
+                    "compatible_open_key": "",
                     "error_type": error.error_type,
                     "error_message": error.message,
                 }

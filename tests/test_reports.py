@@ -10,6 +10,7 @@ from aerobictoolkit.analysis.models import (
     BeatGrid,
     EnergyAnalysis,
     EnergySection,
+    MusicalKeyAnalysis,
     TrackAnalysis,
     TrackAnalysisError,
     TrackMetadata,
@@ -33,6 +34,15 @@ def test_reports_include_successes_cache_state_and_errors(tmp_path: Path) -> Non
             section_seconds=15.0,
             sections=(EnergySection(0.0, 15.0, 6), EnergySection(15.0, 30.0, 8)),
         ),
+        musical_key=MusicalKeyAnalysis(
+            tonic="A",
+            mode="minor",
+            camelot="8A",
+            open_key="1m",
+            confidence=0.86,
+            compatible_camelot=("8A", "7A", "9A", "8B"),
+            compatible_open_key=("1m", "12m", "2m", "1d"),
+        ),
     )
     result = BatchAnalysisResult(
         directory=tmp_path,
@@ -54,11 +64,14 @@ def test_reports_include_successes_cache_state_and_errors(tmp_path: Path) -> Non
     assert json_data["tracks"][0]["analysis"]["beat_grid"]["beat_count"] == 3
     assert json_data["tracks"][0]["analysis"]["energy"]["score"] == 7
     assert len(json_data["tracks"][0]["analysis"]["energy"]["sections"]) == 2
+    assert json_data["tracks"][0]["analysis"]["musical_key"]["camelot"] == "8A"
     assert csv_rows[0]["title"] == "เพลง"
     assert csv_rows[0]["from_cache"] == "True"
     assert csv_rows[0]["bpm_confidence"] == "0.91"
     assert csv_rows[0]["beat_count"] == "3"
     assert csv_rows[0]["energy_score"] == "7"
     assert csv_rows[0]["energy_level"] == "high"
+    assert csv_rows[0]["musical_key"] == "A minor"
+    assert csv_rows[0]["open_key"] == "1m"
     assert csv_rows[1]["status"] == "error"
     assert csv_rows[1]["error_type"] == "ValueError"

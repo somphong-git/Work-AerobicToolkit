@@ -10,11 +10,12 @@ from .models import (
     BeatGrid,
     EnergyAnalysis,
     EnergySection,
+    MusicalKeyAnalysis,
     TrackAnalysis,
     TrackMetadata,
 )
 
-CACHE_SCHEMA_VERSION = 3
+CACHE_SCHEMA_VERSION = 4
 
 
 class AnalysisCache:
@@ -32,6 +33,7 @@ class AnalysisCache:
         *,
         include_bpm: bool,
         include_energy: bool,
+        include_key: bool,
         min_bpm: float,
         max_bpm: float,
         energy_section_seconds: float,
@@ -43,6 +45,7 @@ class AnalysisCache:
             path,
             include_bpm,
             include_energy,
+            include_key,
             min_bpm,
             max_bpm,
             energy_section_seconds,
@@ -63,6 +66,7 @@ class AnalysisCache:
         *,
         include_bpm: bool,
         include_energy: bool,
+        include_key: bool,
         min_bpm: float,
         max_bpm: float,
         energy_section_seconds: float,
@@ -74,6 +78,7 @@ class AnalysisCache:
                 path,
                 include_bpm,
                 include_energy,
+                include_key,
                 min_bpm,
                 max_bpm,
                 energy_section_seconds,
@@ -121,6 +126,7 @@ def _fingerprint(
     path: Path,
     include_bpm: bool,
     include_energy: bool,
+    include_key: bool,
     min_bpm: float,
     max_bpm: float,
     energy_section_seconds: float,
@@ -132,6 +138,7 @@ def _fingerprint(
         "profile": {
             "tempo": "confidence+beat-grid-v1" if include_bpm else None,
             "energy": "perceptual-energy-v1" if include_energy else None,
+            "musical_key": "krumhansl-cqt-v1" if include_key else None,
         },
         "tempo_range": [min_bpm, max_bpm] if include_bpm else None,
         "energy_section_seconds": energy_section_seconds if include_energy else None,
@@ -177,6 +184,18 @@ def _analysis_from_dict(data: dict[str, Any]) -> TrackAnalysis:
                 for section in energy_data.get("sections", ())
             ),
         )
+    key_data = data.get("musical_key")
+    musical_key = None
+    if key_data is not None:
+        musical_key = MusicalKeyAnalysis(
+            tonic=str(key_data["tonic"]),
+            mode=str(key_data["mode"]),
+            camelot=str(key_data["camelot"]),
+            open_key=str(key_data["open_key"]),
+            confidence=float(key_data["confidence"]),
+            compatible_camelot=tuple(key_data.get("compatible_camelot", ())),
+            compatible_open_key=tuple(key_data.get("compatible_open_key", ())),
+        )
     return TrackAnalysis(
         metadata=metadata,
         bpm=float(bpm) if bpm is not None else None,
@@ -184,4 +203,5 @@ def _analysis_from_dict(data: dict[str, Any]) -> TrackAnalysis:
         bpm_confidence=float(confidence) if confidence is not None else None,
         beat_grid=beat_grid,
         energy=energy,
+        musical_key=musical_key,
     )

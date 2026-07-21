@@ -4,8 +4,9 @@ Work-AerobicToolkit is an open-source, engine-first foundation for aerobic DJ
 mix workflows. The same core package is intended to support future CLI,
 desktop, web, API, plugin, agent, and mobile interfaces.
 
-> **Project status:** pre-alpha. Sprint 2.6 adds perceptual energy scores and
-> section timelines. Playlist generation and mix rendering remain future work.
+> **Project status:** pre-alpha. Sprint 2.7 adds musical-key detection with
+> Camelot and Open Key notation. Playlist generation and mix rendering remain
+> future work.
 
 ## Installation
 
@@ -57,6 +58,16 @@ python -m aerobictoolkit batch data/input --energy
 
 Use `--energy-section-seconds 10` to change the timeline resolution. Energy is
 opt-in so existing metadata and BPM workflows keep their previous performance.
+
+Detect a track's harmonic key and compatible DJ-wheel positions:
+
+```powershell
+python -m aerobictoolkit analyze "data/input/your-track.mp3" --key
+python -m aerobictoolkit batch data/input --key
+```
+
+Key analysis returns major/minor notation, confidence, Camelot, Open Key, and
+same/adjacent/relative-mode compatibility suggestions.
 
 Analyze every supported track in a folder and write reusable reports:
 

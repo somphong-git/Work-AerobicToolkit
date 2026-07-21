@@ -36,6 +36,7 @@ class TrackAnalysis:
     bpm_confidence: float | None = None
     beat_grid: BeatGrid | None = None
     energy: EnergyAnalysis | None = None
+    musical_key: MusicalKeyAnalysis | None = None
 
     def to_dict(self) -> dict[str, object]:
         """Return a JSON-friendly representation of the analysis result."""
@@ -47,6 +48,7 @@ class TrackAnalysis:
             "confidence_level": self.confidence_level,
             "beat_grid": self.beat_grid.to_dict() if self.beat_grid else None,
             "energy": self.energy.to_dict() if self.energy else None,
+            "musical_key": self.musical_key.to_dict() if self.musical_key else None,
         }
 
     @property
@@ -156,6 +158,44 @@ def energy_level(score: int) -> str:
     if score <= 8:
         return "high"
     return "peak"
+
+
+@dataclass(frozen=True, slots=True)
+class MusicalKeyAnalysis:
+    """Detected musical key and DJ-oriented harmonic notation."""
+
+    tonic: str
+    mode: str
+    camelot: str
+    open_key: str
+    confidence: float
+    compatible_camelot: tuple[str, ...]
+    compatible_open_key: tuple[str, ...]
+
+    @property
+    def name(self) -> str:
+        return f"{self.tonic} {self.mode}"
+
+    @property
+    def confidence_level(self) -> str:
+        if self.confidence >= 0.8:
+            return "high"
+        if self.confidence >= 0.5:
+            return "medium"
+        return "low"
+
+    def to_dict(self) -> dict[str, object]:
+        return {
+            "name": self.name,
+            "tonic": self.tonic,
+            "mode": self.mode,
+            "camelot": self.camelot,
+            "open_key": self.open_key,
+            "confidence": self.confidence,
+            "confidence_level": self.confidence_level,
+            "compatible_camelot": list(self.compatible_camelot),
+            "compatible_open_key": list(self.compatible_open_key),
+        }
 
 
 @dataclass(frozen=True, slots=True)

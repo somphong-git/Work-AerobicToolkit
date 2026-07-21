@@ -1,20 +1,20 @@
 # Roadmap
 
-## Current: Sprint 3.0 — Workout Session Model
+## Current: Sprint 3.1 — Rule-Based Playlist Generator
 
-The current release defines the workout structure consumed by future planners.
+The current release fills a workout session from analyzed library tracks.
 
-- [x] Define warm-up, cardio, peak, and cool-down phase identifiers.
-- [x] Require every phase exactly once in the canonical order.
-- [x] Model target duration, BPM range, and energy range per phase.
-- [x] Validate invalid ranges at domain-object construction time.
-- [x] Serialize and restore sessions through interface-neutral dictionaries.
-- [x] Provide a tested 60-minute standard planning template.
+- [x] Require duration, BPM, and energy metadata for candidate tracks.
+- [x] Score BPM fit, energy fit, and remaining duration fit explicitly.
+- [x] Allocate scarce phases first and never reuse a track.
+- [x] Order intensity upward and then downward for cool-down.
+- [x] Publish timeline positions, duration gaps, completeness, and warnings.
+- [x] Generate through both the Python API and CLI.
 
-## Next: workout-aware playlist planning
+## Next: harmonic and transition planning
 
-The next sprint will assign library candidates to phases and score ordering by
-duration fit, BPM, energy, harmonic compatibility, and tags.
+The next sprint will improve within-phase ordering with Camelot compatibility,
+tempo-step limits, transition scores, and explainable fallback rules.
 
 ## Delivery rules
 

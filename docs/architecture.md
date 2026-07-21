@@ -135,6 +135,22 @@ serialization. It does not yet select tracks or render audio. This separation
 lets future planning strategies evolve while every interface shares the same
 validated workout blueprint.
 
+## Rule-based playlist flow
+
+```text
+WorkoutSession + LibraryTrack[]
+           -> required-metadata filter
+           -> scarcity-first phase allocation
+           -> BPM 45% + energy 35% + duration 20%
+           -> intensity ordering
+           -> GeneratedPlaylist + timeline + warnings
+```
+
+Generation is deterministic and auditable. The first release uses greedy rules
+rather than claiming global optimization. Result contracts retain score
+components and duration gaps so later algorithms can be compared without
+changing interface adapters.
+
 ## Dependency direction
 
 ```text

@@ -4,8 +4,8 @@ Work-AerobicToolkit is an open-source, engine-first foundation for aerobic DJ
 mix workflows. The same core package is intended to support future CLI,
 desktop, web, API, plugin, agent, and mobile interfaces.
 
-> **Project status:** pre-alpha. Sprint 3.0 establishes the workout-session
-> domain model. Automatic playlist generation and mix rendering remain future
+> **Project status:** pre-alpha. Sprint 3.1 adds deterministic rule-based
+> playlist generation. Transition planning and mix rendering remain future
 > work.
 
 ## Installation
@@ -136,6 +136,23 @@ print(session.total_duration_minutes, peak.min_energy)
 Every session contains warm-up, cardio, peak, and cool-down exactly once in
 that order. Each phase owns duration, BPM range, and energy range constraints.
 The preset values are editable planning defaults, not medical guidance.
+
+## Generate a workout playlist
+
+The default generator selects analyzed catalog tracks by BPM, energy, and
+duration, without reusing a track:
+
+```powershell
+python -m aerobictoolkit playlist generate
+python -m aerobictoolkit playlist generate `
+  --duration-tolerance-seconds 90 `
+  --output data/reports/workout-playlist.json
+```
+
+Use `--database PATH` to select another catalog. Tracks require duration, BPM,
+and energy metadata, so index with `library index --energy` first. The JSON
+report includes component scores, timeline positions, phase duration gaps, and
+warnings when the library cannot satisfy a phase.
 
 ## Repository layout
 

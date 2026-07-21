@@ -1,12 +1,12 @@
-"""Reserved entry point for the future playlist example."""
+"""Generate a standard workout playlist from the local catalog."""
 
+import json
 
-def main() -> None:
-    print(
-        "Playlist generation is intentionally deferred until its feature issue "
-        "is approved."
-    )
+from aerobictoolkit.playlist import (
+    generate_playlist_from_catalog,
+    standard_workout_session,
+)
 
-
-if __name__ == "__main__":
-    main()
+session = standard_workout_session("Example Aerobic Class")
+playlist = generate_playlist_from_catalog(session)
+print(json.dumps(playlist.to_dict(), ensure_ascii=False, indent=2))

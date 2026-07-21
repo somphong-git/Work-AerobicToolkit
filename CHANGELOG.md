@@ -10,6 +10,20 @@ All notable changes to this project are documented here. This project follows
 
 - Add playlist scoring and automatic workout ordering.
 
+## [1.0.0] - 2026-07-21
+
+### Added
+
+- Interface-independent `WorkoutSession` and `WorkoutPhase` domain contracts.
+- Canonical warm-up, cardio, peak, and cool-down phase identifiers and order.
+- Validated duration, BPM, and energy envelopes for every workout phase.
+- Stable dictionary serialization and deserialization for future interfaces.
+- A configurable 60-minute standard session factory and metric-fit predicate.
+
+### Changed
+
+- Activated the playlist package as the owner of workout-planning rules.
+
 ## [0.9.0] - 2026-07-21
 
 ### Added
@@ -115,7 +129,8 @@ All notable changes to this project are documented here. This project follows
 - Moved local input, output, report, and cache directories under `data/`.
 - Moved the existing music scanner into `src/aerobictoolkit/analysis/`.
 
-[Unreleased]: https://github.com/somphong-git/Work-AerobicToolkit/compare/v0.9.0...HEAD
+[Unreleased]: https://github.com/somphong-git/Work-AerobicToolkit/compare/v1.0.0...HEAD
+[1.0.0]: https://github.com/somphong-git/Work-AerobicToolkit/releases/tag/v1.0.0
 [0.9.0]: https://github.com/somphong-git/Work-AerobicToolkit/releases/tag/v0.9.0
 [0.8.0]: https://github.com/somphong-git/Work-AerobicToolkit/releases/tag/v0.8.0
 [0.7.0]: https://github.com/somphong-git/Work-AerobicToolkit/releases/tag/v0.7.0

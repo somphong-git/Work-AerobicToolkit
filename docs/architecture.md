@@ -120,6 +120,21 @@ entire database. Import validates records before passing them through the same
 catalog upsert boundary used by future interfaces. File-format schema versions
 are independent from the internal SQLite schema version.
 
+## Workout-session domain
+
+```text
+WorkoutSession
+  -> warm-up   (duration + BPM/energy envelope)
+  -> cardio    (duration + BPM/energy envelope)
+  -> peak      (duration + BPM/energy envelope)
+  -> cool-down (duration + BPM/energy envelope)
+```
+
+The playlist domain owns phase identity, canonical order, constraints, and
+serialization. It does not yet select tracks or render audio. This separation
+lets future planning strategies evolve while every interface shares the same
+validated workout blueprint.
+
 ## Dependency direction
 
 ```text

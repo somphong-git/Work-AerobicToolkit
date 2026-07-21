@@ -5,7 +5,7 @@ from aerobictoolkit.cli import _configure_stdout, build_parser
 
 
 def test_package_has_version():
-    assert __version__ == "0.9.0"
+    assert __version__ == "1.0.0"
 
 
 def test_cli_parser_accepts_version():

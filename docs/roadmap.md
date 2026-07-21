@@ -1,20 +1,20 @@
 # Roadmap
 
-## Current: Sprint 2.9 — Library Import, Export, and Backup
+## Current: Sprint 3.0 — Workout Session Model
 
-The current release makes library metadata portable and recoverable.
+The current release defines the workout structure consumed by future planners.
 
-- [x] Export all indexed metadata and tags to versioned JSON.
-- [x] Export Excel-compatible UTF-8 CSV without corrupting tag separators.
-- [x] Import JSON and CSV with field validation and actionable row errors.
-- [x] Update matching paths and merge tags without duplicating tracks.
-- [x] Create consistent SQLite backups through the engine API.
-- [x] Expose transfer operations through Python and CLI.
+- [x] Define warm-up, cardio, peak, and cool-down phase identifiers.
+- [x] Require every phase exactly once in the canonical order.
+- [x] Model target duration, BPM range, and energy range per phase.
+- [x] Validate invalid ranges at domain-object construction time.
+- [x] Serialize and restore sessions through interface-neutral dictionaries.
+- [x] Provide a tested 60-minute standard planning template.
 
-## Next: playlist planning
+## Next: workout-aware playlist planning
 
-The next sprint will score candidate tracks and build workout-aware ordering
-from BPM, energy, harmonic compatibility, tags, and phase constraints.
+The next sprint will assign library candidates to phases and score ordering by
+duration fit, BPM, energy, harmonic compatibility, and tags.
 
 ## Delivery rules
 

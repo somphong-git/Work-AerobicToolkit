@@ -10,6 +10,16 @@ All notable changes to this project are documented here. This project follows
 
 - Add playlist scoring and automatic workout ordering.
 
+## [0.9.0] - 2026-07-21
+
+### Added
+
+- Versioned JSON and spreadsheet-friendly UTF-8 CSV library exports.
+- JSON/CSV metadata import with path-based updates and tag merging.
+- Transactionally consistent full-catalog backup using SQLite's backup API.
+- `library export`, `library import`, and `library backup` CLI commands.
+- Public transfer APIs and round-trip coverage for Thai metadata and tags.
+
 ## [0.8.0] - 2026-07-21
 
 ### Added
@@ -105,7 +115,8 @@ All notable changes to this project are documented here. This project follows
 - Moved local input, output, report, and cache directories under `data/`.
 - Moved the existing music scanner into `src/aerobictoolkit/analysis/`.
 
-[Unreleased]: https://github.com/somphong-git/Work-AerobicToolkit/compare/v0.8.0...HEAD
+[Unreleased]: https://github.com/somphong-git/Work-AerobicToolkit/compare/v0.9.0...HEAD
+[0.9.0]: https://github.com/somphong-git/Work-AerobicToolkit/releases/tag/v0.9.0
 [0.8.0]: https://github.com/somphong-git/Work-AerobicToolkit/releases/tag/v0.8.0
 [0.7.0]: https://github.com/somphong-git/Work-AerobicToolkit/releases/tag/v0.7.0
 [0.6.0]: https://github.com/somphong-git/Work-AerobicToolkit/releases/tag/v0.6.0

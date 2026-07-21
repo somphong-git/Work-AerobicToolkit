@@ -181,6 +181,74 @@ class LibraryCatalog:
         ).fetchall()
         return tuple((row["name"], row["track_count"]) for row in rows)
 
+    def import_metadata(self, record: dict[str, object]) -> tuple[LibraryTrack, bool]:
+        """Upsert one validated portable record and merge its tags."""
+        path = str(Path(str(record["path"])).expanduser().resolve())
+        existed = self.get(path) is not None
+        indexed_at = str(record.get("indexed_at") or datetime.now(UTC).isoformat())
+        values = (
+            path,
+            str(record["title"]),
+            _optional_string(record.get("artist")),
+            _optional_string(record.get("album")),
+            record.get("duration_seconds"),
+            str(record["file_format"]).lower(),
+            int(record["file_size_bytes"]),
+            record.get("bpm"),
+            record.get("bpm_confidence"),
+            record.get("energy_score"),
+            _optional_string(record.get("energy_level")),
+            _optional_string(record.get("musical_key")),
+            _optional_string(record.get("mode")),
+            _optional_string(record.get("camelot")),
+            _optional_string(record.get("open_key")),
+            record.get("key_confidence"),
+            indexed_at,
+            json.dumps(record, ensure_ascii=False),
+        )
+        self._connection.execute(
+            """INSERT INTO tracks (
+                path, title, artist, album, duration_seconds, file_format,
+                file_size_bytes, bpm, bpm_confidence, energy_score, energy_level,
+                musical_key, mode, camelot, open_key, key_confidence, indexed_at,
+                analysis_json
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ON CONFLICT(path) DO UPDATE SET
+                title=excluded.title, artist=excluded.artist, album=excluded.album,
+                duration_seconds=excluded.duration_seconds,
+                file_format=excluded.file_format,
+                file_size_bytes=excluded.file_size_bytes, bpm=excluded.bpm,
+                bpm_confidence=excluded.bpm_confidence,
+                energy_score=excluded.energy_score, energy_level=excluded.energy_level,
+                musical_key=excluded.musical_key, mode=excluded.mode,
+                camelot=excluded.camelot, open_key=excluded.open_key,
+                key_confidence=excluded.key_confidence, indexed_at=excluded.indexed_at,
+                analysis_json=excluded.analysis_json""",
+            values,
+        )
+        self._connection.commit()
+        tags = record.get("tags", [])
+        if tags:
+            if not isinstance(tags, list) or not all(
+                isinstance(tag, str) for tag in tags
+            ):
+                raise ValueError("Track tags must be a list of strings.")
+            self.add_tags(path, tags)
+        track = self.get(path)
+        if track is None:  # pragma: no cover - database invariant
+            raise RuntimeError("Catalog did not return the imported track.")
+        return track, existed
+
+    def backup(self, destination: str | Path) -> Path:
+        """Create a transactionally consistent SQLite backup."""
+        target = Path(destination).expanduser().resolve()
+        if target == self.path:
+            raise ValueError("Backup destination must differ from the catalog path.")
+        target.parent.mkdir(parents=True, exist_ok=True)
+        with sqlite3.connect(target) as backup_connection:
+            self._connection.backup(backup_connection)
+        return target
+
     def _require_track(self, path: str | Path) -> LibraryTrack:
         track = self.get(path)
         if track is None:
@@ -296,6 +364,10 @@ def _normalize_tags(tags: Iterable[str]) -> tuple[str, ...]:
 
 def _escape_like(value: str) -> str:
     return value.replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_")
+
+
+def _optional_string(value: object) -> str | None:
+    return None if value is None or value == "" else str(value)
 
 
 def _row_to_track(row: sqlite3.Row) -> LibraryTrack:

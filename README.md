@@ -4,9 +4,9 @@ Work-AerobicToolkit is an open-source, engine-first foundation for aerobic DJ
 mix workflows. The same core package is intended to support future CLI,
 desktop, web, API, plugin, agent, and mobile interfaces.
 
-> **Project status:** pre-alpha. Sprint 2.8 adds a persistent, searchable local
-> music catalog with filters and tags. Playlist generation and mix rendering
-> remain future work.
+> **Project status:** pre-alpha. Sprint 2.9 adds portable metadata transfer and
+> consistent catalog backups. Playlist generation and mix rendering remain
+> future work.
 
 ## Installation
 
@@ -102,6 +102,23 @@ python -m aerobictoolkit library tags
 
 The default catalog is `data/library/catalog.sqlite3`. Use `--database PATH`
 to select another catalog. For a quick metadata-only catalog, use `--no-bpm`.
+
+## Transfer and back up the library
+
+Export portable metadata, restore it into another catalog, or create a complete
+SQLite backup:
+
+```powershell
+python -m aerobictoolkit library export data/reports/library.json
+python -m aerobictoolkit library export data/reports/library.csv
+python -m aerobictoolkit library import data/reports/library.json
+python -m aerobictoolkit library backup data/output/catalog-backup.sqlite3
+```
+
+JSON is versioned for application integration. CSV is UTF-8 with BOM for
+spreadsheet compatibility. Import updates matching paths, merges incoming tags,
+and reports separate imported and updated counts. A backup contains the full
+database and can be selected with `--database` immediately.
 
 ## Repository layout
 

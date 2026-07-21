@@ -1,15 +1,15 @@
 # Roadmap
 
-## Current: Sprint 2.8 — Library Index
+## Current: Sprint 2.9 — Library Import, Export, and Backup
 
-The current release turns analyzed files into reusable local library data.
+The current release makes library metadata portable and recoverable.
 
-- [x] Persist tracks and complete analysis JSON in SQLite.
-- [x] Update existing tracks without duplicating paths or losing tags.
-- [x] Search title, artist, album, and path.
-- [x] Filter by BPM, energy, Camelot key, mode, format, and multiple tags.
-- [x] Add, remove, list, and search case-insensitive tags.
-- [x] Expose the same catalog service through Python and CLI.
+- [x] Export all indexed metadata and tags to versioned JSON.
+- [x] Export Excel-compatible UTF-8 CSV without corrupting tag separators.
+- [x] Import JSON and CSV with field validation and actionable row errors.
+- [x] Update matching paths and merge tags without duplicating tracks.
+- [x] Create consistent SQLite backups through the engine API.
+- [x] Expose transfer operations through Python and CLI.
 
 ## Next: playlist planning
 

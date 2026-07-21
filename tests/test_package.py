@@ -5,7 +5,7 @@ from aerobictoolkit.cli import _configure_stdout, build_parser
 
 
 def test_package_has_version():
-    assert __version__ == "0.8.0"
+    assert __version__ == "0.9.0"
 
 
 def test_cli_parser_accepts_version():
@@ -75,6 +75,16 @@ def test_cli_parser_accepts_library_search_filters():
     assert args.min_bpm == 120.0
     assert args.max_energy == 8
     assert args.tag == ["cardio"]
+
+
+@pytest.mark.parametrize("command", ["export", "import", "backup"])
+def test_cli_parser_accepts_library_transfer_commands(command: str):
+    args = build_parser().parse_args(
+        ["library", command, "data/reports/library.json", "--database", "catalog.db"]
+    )
+
+    assert args.library_command == command
+    assert args.database.name == "catalog.db"
 
 
 def test_configure_stdout_handles_streams_without_reconfigure(

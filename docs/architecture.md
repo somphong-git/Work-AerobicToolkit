@@ -75,6 +75,23 @@ Tempo and energy share one decoded mono signal when requested together. Energy
 is opt-in and uses calibrated signal heuristics rather than LUFS. The engine
 publishes the component metrics so later calibration remains explainable.
 
+## Musical-key analysis flow
+
+```text
+Decoded audio -> middle 60 seconds -> 22.05 kHz -> harmonic CQT chromagram
+                                                    |
+                                                    v
+                                      24 major/minor profile correlations
+                                                    |
+                                                    v
+                                  key + confidence + Camelot + Open Key
+```
+
+The key adapter uses librosa's 12-bin Constant-Q chromagram and Krumhansl
+major/minor profiles. Keeping the working segment bounded prevents large WAV
+files from exhausting memory while tempo, energy, and key still share the
+original decode operation.
+
 ## Dependency direction
 
 ```text

@@ -5,7 +5,7 @@ from aerobictoolkit.cli import _configure_stdout, build_parser
 
 
 def test_package_has_version():
-    assert __version__ == "0.6.0"
+    assert __version__ == "0.7.0"
 
 
 def test_cli_parser_accepts_version():
@@ -36,6 +36,12 @@ def test_cli_parser_accepts_energy_timeline_options():
 
     assert args.energy is True
     assert args.energy_section_seconds == 10.0
+
+
+def test_cli_parser_accepts_musical_key_option():
+    args = build_parser().parse_args(["analyze", "track.wav", "--key"])
+
+    assert args.key is True
 
 
 def test_configure_stdout_handles_streams_without_reconfigure(

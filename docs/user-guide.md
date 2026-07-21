@@ -2,9 +2,9 @@
 
 ## Current capability
 
-This release can scan local tracks, normalize BPM, grade tempo confidence,
-produce beat and energy timelines, and analyze a whole directory with
-persistent caching. It is not yet a finished DJ-mixing product.
+This release can scan local tracks, normalize BPM, grade tempo and key
+confidence, produce beat and energy timelines, and analyze a whole directory
+with persistent caching. It is not yet a finished DJ-mixing product.
 
 ```bash
 python -m aerobictoolkit --version
@@ -53,6 +53,25 @@ Energy levels are `very-low` (1–2), `low` (3–4), `moderate` (5–6), `high`
 (7–8), and `peak` (9–10). The score combines RMS loudness, onset activity, and
 spectral brightness. It is intended for relative workout programming and is
 not a broadcast loudness or LUFS measurement.
+
+## Musical key and harmonic compatibility
+
+```bash
+python -m aerobictoolkit analyze "data/input/your-track.wav" --key --json
+python -m aerobictoolkit batch data/input --key
+```
+
+The result includes conventional key notation, Camelot, Open Key, confidence,
+and four compatible wheel positions:
+
+- the same Camelot position;
+- the previous and next number in the same mode;
+- the relative major or minor at the same number.
+
+For example, `8A` (A minor / `1m`) is compatible with `8A`, `7A`, `9A`, and
+`8B`. Low-confidence results should be reviewed by ear before rendering a mix.
+Key detection analyzes a downsampled 60-second middle segment to bound memory
+use on studio-quality WAV files.
 
 ## Batch analysis
 

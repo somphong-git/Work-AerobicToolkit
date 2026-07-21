@@ -8,7 +8,22 @@ All notable changes to this project are documented here. This project follows
 
 ### Planned
 
-- Add musical-key and harmonic-compatibility analysis.
+- Add a persistent, searchable local music-library index.
+
+## [0.7.0] - 2026-07-21
+
+### Added
+
+- Major/minor musical-key detection using harmonic CQT chroma profiles.
+- Key confidence, Camelot notation, and Open Key notation.
+- Same-key, adjacent-wheel, and relative-mode compatibility suggestions.
+- `--key` option for single-track and batch CLI analysis.
+- Musical-key fields in cache, JSON, and CSV reports.
+
+### Changed
+
+- Key analysis uses a downsampled 60-second middle segment to bound memory.
+- Upgraded the analysis cache schema for musical-key profiles.
 
 ## [0.6.0] - 2026-07-21
 
@@ -76,7 +91,8 @@ All notable changes to this project are documented here. This project follows
 - Moved local input, output, report, and cache directories under `data/`.
 - Moved the existing music scanner into `src/aerobictoolkit/analysis/`.
 
-[Unreleased]: https://github.com/somphong-git/Work-AerobicToolkit/compare/v0.6.0...HEAD
+[Unreleased]: https://github.com/somphong-git/Work-AerobicToolkit/compare/v0.7.0...HEAD
+[0.7.0]: https://github.com/somphong-git/Work-AerobicToolkit/releases/tag/v0.7.0
 [0.6.0]: https://github.com/somphong-git/Work-AerobicToolkit/releases/tag/v0.6.0
 [0.5.0]: https://github.com/somphong-git/Work-AerobicToolkit/releases/tag/v0.5.0
 [0.4.0]: https://github.com/somphong-git/Work-AerobicToolkit/releases/tag/v0.4.0

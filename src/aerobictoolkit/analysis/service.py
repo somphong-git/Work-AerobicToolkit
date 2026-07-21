@@ -10,10 +10,12 @@ from .energy import DEFAULT_ENERGY_SECTION_SECONDS, analyze_energy_samples
 from .models import (
     BeatGrid,
     EnergyAnalysis,
+    MusicalKeyAnalysis,
     TempoAnalysis,
     TrackAnalysis,
     TrackMetadata,
 )
+from .musical_key import analyze_key_samples
 
 DEFAULT_MIN_BPM = 90.0
 DEFAULT_MAX_BPM = 180.0
@@ -99,6 +101,18 @@ def analyze_energy(
     )
 
 
+def analyze_musical_key(path: str | Path) -> MusicalKeyAnalysis:
+    """Detect musical key and return Camelot/Open Key notation."""
+    track_path = Path(path).expanduser().resolve()
+    if not track_path.is_file():
+        message = f"Audio file does not exist: {track_path}"
+        raise FileNotFoundError(message)
+
+    librosa = _load_librosa()
+    samples, sample_rate = librosa.load(track_path, mono=True, sr=None)
+    return analyze_key_samples(librosa, samples, sample_rate)
+
+
 def _analyze_tempo_samples(
     librosa: Any,
     samples: Any,
@@ -153,13 +167,14 @@ def analyze_track(
     *,
     include_bpm: bool = True,
     include_energy: bool = False,
+    include_key: bool = False,
     min_bpm: float = DEFAULT_MIN_BPM,
     max_bpm: float = DEFAULT_MAX_BPM,
     energy_section_seconds: float = DEFAULT_ENERGY_SECTION_SECONDS,
 ) -> TrackAnalysis:
     """Return selected metrics while decoding audio at most once."""
     metadata = read_track_metadata(path)
-    if not include_bpm and not include_energy:
+    if not include_bpm and not include_energy and not include_key:
         return TrackAnalysis(metadata=metadata, bpm=None)
 
     if include_bpm:
@@ -187,6 +202,9 @@ def analyze_track(
         if include_energy
         else None
     )
+    musical_key = (
+        analyze_key_samples(librosa, samples, sample_rate) if include_key else None
+    )
     return TrackAnalysis(
         metadata=metadata,
         bpm=tempo.normalized_bpm if tempo else None,
@@ -194,6 +212,7 @@ def analyze_track(
         bpm_confidence=tempo.confidence if tempo else None,
         beat_grid=tempo.beat_grid if tempo else None,
         energy=energy,
+        musical_key=musical_key,
     )
 
 

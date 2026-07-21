@@ -39,6 +39,7 @@ def test_batch_uses_cache_and_invalidates_changed_files(
         *,
         include_bpm: bool,
         include_energy: bool,
+        include_key: bool,
         min_bpm: float,
         max_bpm: float,
         energy_section_seconds: float,
@@ -64,6 +65,8 @@ def test_batch_uses_cache_and_invalidates_changed_files(
         include_energy=True,
         energy_section_seconds=10.0,
     )
+    eighth = analyze_directory(music, cache_path=cache_path, include_key=True)
+    ninth = analyze_directory(music, cache_path=cache_path, include_key=True)
 
     assert first.analyzed_count == 2
     assert second.cache_hit_count == 2
@@ -74,7 +77,9 @@ def test_batch_uses_cache_and_invalidates_changed_files(
     assert fifth.analyzed_count == 2
     assert sixth.cache_hit_count == 2
     assert seventh.analyzed_count == 2
-    assert len(calls) == 9
+    assert eighth.analyzed_count == 2
+    assert ninth.cache_hit_count == 2
+    assert len(calls) == 11
 
 
 def test_batch_captures_bad_track_without_stopping_directory(
@@ -92,6 +97,7 @@ def test_batch_captures_bad_track_without_stopping_directory(
         *,
         include_bpm: bool,
         include_energy: bool,
+        include_key: bool,
         min_bpm: float,
         max_bpm: float,
         energy_section_seconds: float,

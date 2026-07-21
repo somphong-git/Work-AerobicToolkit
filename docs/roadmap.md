@@ -1,22 +1,21 @@
 # Roadmap
 
-## Current: Sprint 2.6 — Energy Analysis
+## Current: Sprint 2.7 — Musical Key Analysis
 
-The current release adds perceptual intensity information for aerobic session
-planning.
+The current release adds harmonic metadata for compatible playlist ordering.
 
-- [x] Calculate an explainable overall energy score from 1–10.
-- [x] Classify very-low, low, moderate, high, and peak energy.
-- [x] Generate configurable energy sections that default to 15 seconds.
-- [x] Decode audio once when BPM and energy are requested together.
-- [x] Include energy in cache, JSON, CSV, CLI, and batch workflows.
-- [x] Keep energy opt-in for backward-compatible runtime performance.
+- [x] Detect all 12 roots in major and minor modes.
+- [x] Publish confidence and low, medium, or high review guidance.
+- [x] Map every result to Camelot and Open Key notation.
+- [x] Suggest same, adjacent, and relative-mode wheel positions.
+- [x] Bound CQT memory with a downsampled 60-second analysis segment.
+- [x] Include key data in cache, JSON, CSV, CLI, and batch workflows.
 
-## Next: musical-key analysis
+## Next: music-library index
 
-The next sprint will detect musical key and expose Camelot/Open Key values for
-harmonic playlist ordering. Library indexing, playlist optimization, and mix
-rendering remain later milestones.
+The next sprint will persist analyzed tracks in a searchable local catalog with
+filtering by BPM, confidence, energy, key, format, and duration. Playlist
+optimization and mix rendering remain later milestones.
 
 ## Delivery rules
 

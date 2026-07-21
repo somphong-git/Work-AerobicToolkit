@@ -4,8 +4,8 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "work-aerobictoolkit"
-version = "0.6.0"
-description = "Tempo and energy analysis engine for aerobic DJ mix workflows."
+version = "0.7.0"
+description = "Tempo, energy, and musical-key engine for aerobic DJ mix workflows."
 readme = "README.md"
 requires-python = ">=3.12"
 license = "MIT"

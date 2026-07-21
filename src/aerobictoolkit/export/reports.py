@@ -25,6 +25,12 @@ CSV_FIELDS = (
     "beat_count",
     "first_beat_seconds",
     "beat_times_seconds",
+    "energy_score",
+    "energy_level",
+    "energy_rms_db",
+    "energy_onset_rate",
+    "energy_brightness",
+    "energy_sections",
     "error_type",
     "error_message",
 )
@@ -77,6 +83,31 @@ def write_csv_report(result: BatchAnalysisResult, path: str | Path) -> Path:
                         if item.analysis.beat_grid
                         else ""
                     ),
+                    "energy_score": (
+                        item.analysis.energy.score if item.analysis.energy else ""
+                    ),
+                    "energy_level": (
+                        item.analysis.energy.level if item.analysis.energy else ""
+                    ),
+                    "energy_rms_db": (
+                        item.analysis.energy.rms_db if item.analysis.energy else ""
+                    ),
+                    "energy_onset_rate": (
+                        item.analysis.energy.onset_rate if item.analysis.energy else ""
+                    ),
+                    "energy_brightness": (
+                        item.analysis.energy.brightness if item.analysis.energy else ""
+                    ),
+                    "energy_sections": (
+                        json.dumps(
+                            [
+                                section.to_dict()
+                                for section in item.analysis.energy.sections
+                            ]
+                        )
+                        if item.analysis.energy
+                        else ""
+                    ),
                     "error_type": "",
                     "error_message": "",
                 }
@@ -100,6 +131,12 @@ def write_csv_report(result: BatchAnalysisResult, path: str | Path) -> Path:
                     "beat_count": "",
                     "first_beat_seconds": "",
                     "beat_times_seconds": "",
+                    "energy_score": "",
+                    "energy_level": "",
+                    "energy_rms_db": "",
+                    "energy_onset_rate": "",
+                    "energy_brightness": "",
+                    "energy_sections": "",
                     "error_type": error.error_type,
                     "error_message": error.message,
                 }

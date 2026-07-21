@@ -3,8 +3,8 @@
 ## Current capability
 
 This release can scan local tracks, normalize BPM, grade tempo confidence,
-produce a beat grid, and analyze a whole directory with persistent caching. It
-is not yet a finished DJ-mixing product.
+produce beat and energy timelines, and analyze a whole directory with
+persistent caching. It is not yet a finished DJ-mixing product.
 
 ```bash
 python -m aerobictoolkit --version
@@ -36,6 +36,23 @@ python -m aerobictoolkit batch data/input --min-bpm 100 --max-bpm 200
 
 The maximum must be at least twice the minimum so every positive tempo has an
 unambiguous octave-normalized value.
+
+## Energy score and timeline
+
+Energy analysis is opt-in and returns an overall score from 1–10 plus sections
+that default to 15 seconds:
+
+```bash
+python -m aerobictoolkit analyze "data/input/your-track.wav" --energy --json
+python -m aerobictoolkit batch data/input --energy
+python -m aerobictoolkit batch data/input --energy \
+  --energy-section-seconds 10
+```
+
+Energy levels are `very-low` (1–2), `low` (3–4), `moderate` (5–6), `high`
+(7–8), and `peak` (9–10). The score combines RMS loudness, onset activity, and
+spectral brightness. It is intended for relative workout programming and is
+not a broadcast loudness or LUFS measurement.
 
 ## Batch analysis
 

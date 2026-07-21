@@ -6,9 +6,15 @@ import json
 from pathlib import Path
 from typing import Any
 
-from .models import BeatGrid, TrackAnalysis, TrackMetadata
+from .models import (
+    BeatGrid,
+    EnergyAnalysis,
+    EnergySection,
+    TrackAnalysis,
+    TrackMetadata,
+)
 
-CACHE_SCHEMA_VERSION = 2
+CACHE_SCHEMA_VERSION = 3
 
 
 class AnalysisCache:
@@ -25,13 +31,22 @@ class AnalysisCache:
         path: Path,
         *,
         include_bpm: bool,
+        include_energy: bool,
         min_bpm: float,
         max_bpm: float,
+        energy_section_seconds: float,
     ) -> TrackAnalysis | None:
         """Return a current cached result, or ``None`` when it must be analyzed."""
         key = str(path.resolve())
         entry = self._entries.get(key)
-        fingerprint = _fingerprint(path, include_bpm, min_bpm, max_bpm)
+        fingerprint = _fingerprint(
+            path,
+            include_bpm,
+            include_energy,
+            min_bpm,
+            max_bpm,
+            energy_section_seconds,
+        )
         if entry is None or entry.get("fingerprint") != fingerprint:
             return None
 
@@ -47,13 +62,22 @@ class AnalysisCache:
         analysis: TrackAnalysis,
         *,
         include_bpm: bool,
+        include_energy: bool,
         min_bpm: float,
         max_bpm: float,
+        energy_section_seconds: float,
     ) -> None:
         """Stage one successful result for persistence."""
         path = analysis.metadata.path.resolve()
         self._entries[str(path)] = {
-            "fingerprint": _fingerprint(path, include_bpm, min_bpm, max_bpm),
+            "fingerprint": _fingerprint(
+                path,
+                include_bpm,
+                include_energy,
+                min_bpm,
+                max_bpm,
+                energy_section_seconds,
+            ),
             "analysis": analysis.to_dict(),
         }
 
@@ -94,14 +118,23 @@ class AnalysisCache:
 
 
 def _fingerprint(
-    path: Path, include_bpm: bool, min_bpm: float, max_bpm: float
+    path: Path,
+    include_bpm: bool,
+    include_energy: bool,
+    min_bpm: float,
+    max_bpm: float,
+    energy_section_seconds: float,
 ) -> dict[str, object]:
     stat = path.stat()
     return {
         "size": stat.st_size,
         "modified_ns": stat.st_mtime_ns,
-        "profile": "tempo-confidence+beat-grid-v1" if include_bpm else "metadata-v1",
+        "profile": {
+            "tempo": "confidence+beat-grid-v1" if include_bpm else None,
+            "energy": "perceptual-energy-v1" if include_energy else None,
+        },
         "tempo_range": [min_bpm, max_bpm] if include_bpm else None,
+        "energy_section_seconds": energy_section_seconds if include_energy else None,
     }
 
 
@@ -125,10 +158,30 @@ def _analysis_from_dict(data: dict[str, Any]) -> TrackAnalysis:
         beat_grid = BeatGrid(
             tuple(float(value) for value in beat_grid_data.get("times_seconds", ()))
         )
+    energy_data = data.get("energy")
+    energy = None
+    if energy_data is not None:
+        metrics = energy_data["metrics"]
+        energy = EnergyAnalysis(
+            score=int(energy_data["score"]),
+            rms_db=float(metrics["rms_db"]),
+            onset_rate=float(metrics["onset_rate"]),
+            brightness=float(metrics["brightness"]),
+            section_seconds=float(energy_data["section_seconds"]),
+            sections=tuple(
+                EnergySection(
+                    start_seconds=float(section["start_seconds"]),
+                    end_seconds=float(section["end_seconds"]),
+                    score=int(section["score"]),
+                )
+                for section in energy_data.get("sections", ())
+            ),
+        )
     return TrackAnalysis(
         metadata=metadata,
         bpm=float(bpm) if bpm is not None else None,
         raw_bpm=float(raw_bpm) if raw_bpm is not None else None,
         bpm_confidence=float(confidence) if confidence is not None else None,
         beat_grid=beat_grid,
+        energy=energy,
     )

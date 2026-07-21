@@ -6,7 +6,14 @@ from pathlib import Path
 from statistics import median
 from typing import Any
 
-from .models import BeatGrid, TempoAnalysis, TrackAnalysis, TrackMetadata
+from .energy import DEFAULT_ENERGY_SECTION_SECONDS, analyze_energy_samples
+from .models import (
+    BeatGrid,
+    EnergyAnalysis,
+    TempoAnalysis,
+    TrackAnalysis,
+    TrackMetadata,
+)
 
 DEFAULT_MIN_BPM = 90.0
 DEFAULT_MAX_BPM = 180.0
@@ -62,6 +69,45 @@ def analyze_tempo(
 
     librosa = _load_librosa()
     samples, sample_rate = librosa.load(track_path, mono=True, sr=None)
+    return _analyze_tempo_samples(
+        librosa,
+        samples,
+        sample_rate,
+        min_bpm=min_bpm,
+        max_bpm=max_bpm,
+    )
+
+
+def analyze_energy(
+    path: str | Path,
+    *,
+    section_seconds: float = DEFAULT_ENERGY_SECTION_SECONDS,
+) -> EnergyAnalysis:
+    """Analyze perceptual energy from 1–10 and a section timeline."""
+    track_path = Path(path).expanduser().resolve()
+    if not track_path.is_file():
+        message = f"Audio file does not exist: {track_path}"
+        raise FileNotFoundError(message)
+
+    librosa = _load_librosa()
+    samples, sample_rate = librosa.load(track_path, mono=True, sr=None)
+    return analyze_energy_samples(
+        librosa,
+        samples,
+        sample_rate,
+        section_seconds=section_seconds,
+    )
+
+
+def _analyze_tempo_samples(
+    librosa: Any,
+    samples: Any,
+    sample_rate: int,
+    *,
+    min_bpm: float,
+    max_bpm: float,
+) -> TempoAnalysis:
+    """Analyze tempo from an already decoded signal."""
     onset_envelope = librosa.onset.onset_strength(y=samples, sr=sample_rate)
     tempo, beat_frames = librosa.beat.beat_track(
         onset_envelope=onset_envelope, sr=sample_rate
@@ -106,21 +152,48 @@ def analyze_track(
     path: str | Path,
     *,
     include_bpm: bool = True,
+    include_energy: bool = False,
     min_bpm: float = DEFAULT_MIN_BPM,
     max_bpm: float = DEFAULT_MAX_BPM,
+    energy_section_seconds: float = DEFAULT_ENERGY_SECTION_SECONDS,
 ) -> TrackAnalysis:
-    """Return metadata and, optionally, an estimated BPM for one track."""
+    """Return selected metrics while decoding audio at most once."""
     metadata = read_track_metadata(path)
-    if not include_bpm:
+    if not include_bpm and not include_energy:
         return TrackAnalysis(metadata=metadata, bpm=None)
 
-    tempo = analyze_tempo(metadata.path, min_bpm=min_bpm, max_bpm=max_bpm)
+    if include_bpm:
+        _validate_tempo_range(min_bpm, max_bpm)
+    librosa = _load_librosa()
+    samples, sample_rate = librosa.load(metadata.path, mono=True, sr=None)
+    tempo = (
+        _analyze_tempo_samples(
+            librosa,
+            samples,
+            sample_rate,
+            min_bpm=min_bpm,
+            max_bpm=max_bpm,
+        )
+        if include_bpm
+        else None
+    )
+    energy = (
+        analyze_energy_samples(
+            librosa,
+            samples,
+            sample_rate,
+            section_seconds=energy_section_seconds,
+        )
+        if include_energy
+        else None
+    )
     return TrackAnalysis(
         metadata=metadata,
-        bpm=tempo.normalized_bpm,
-        raw_bpm=tempo.raw_bpm,
-        bpm_confidence=tempo.confidence,
-        beat_grid=tempo.beat_grid,
+        bpm=tempo.normalized_bpm if tempo else None,
+        raw_bpm=tempo.raw_bpm if tempo else None,
+        bpm_confidence=tempo.confidence if tempo else None,
+        beat_grid=tempo.beat_grid if tempo else None,
+        energy=energy,
     )
 
 
@@ -160,12 +233,12 @@ def _load_mutagen_file() -> Any:
 
 
 def _load_librosa() -> Any:
-    """Load the BPM adapter only when BPM estimation is requested."""
+    """Load the signal-processing adapter only when analysis is requested."""
     try:
         import librosa
     except ImportError as error:
         raise AudioAnalysisDependencyError(
-            "BPM analysis requires the analysis extra. "
+            "Audio analysis requires the analysis extra. "
             "Install it with: pip install -e '.[analysis]'"
         ) from error
     return librosa

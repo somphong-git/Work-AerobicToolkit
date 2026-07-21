@@ -35,7 +35,13 @@ def test_batch_uses_cache_and_invalidates_changed_files(
     calls: list[Path] = []
 
     def fake_analyze(
-        path: Path, *, include_bpm: bool, min_bpm: float, max_bpm: float
+        path: Path,
+        *,
+        include_bpm: bool,
+        include_energy: bool,
+        min_bpm: float,
+        max_bpm: float,
+        energy_section_seconds: float,
     ) -> TrackAnalysis:
         calls.append(path)
         return _analysis(path, 128.0 if include_bpm else None)
@@ -50,6 +56,14 @@ def test_batch_uses_cache_and_invalidates_changed_files(
     fourth = analyze_directory(
         music, cache_path=cache_path, min_bpm=100.0, max_bpm=200.0
     )
+    fifth = analyze_directory(music, cache_path=cache_path, include_energy=True)
+    sixth = analyze_directory(music, cache_path=cache_path, include_energy=True)
+    seventh = analyze_directory(
+        music,
+        cache_path=cache_path,
+        include_energy=True,
+        energy_section_seconds=10.0,
+    )
 
     assert first.analyzed_count == 2
     assert second.cache_hit_count == 2
@@ -57,7 +71,10 @@ def test_batch_uses_cache_and_invalidates_changed_files(
     assert third.analyzed_count == 1
     assert fourth.cache_hit_count == 0
     assert fourth.analyzed_count == 2
-    assert len(calls) == 5
+    assert fifth.analyzed_count == 2
+    assert sixth.cache_hit_count == 2
+    assert seventh.analyzed_count == 2
+    assert len(calls) == 9
 
 
 def test_batch_captures_bad_track_without_stopping_directory(
@@ -71,7 +88,13 @@ def test_batch_captures_bad_track_without_stopping_directory(
     bad.write_bytes(b"bad")
 
     def fake_analyze(
-        path: Path, *, include_bpm: bool, min_bpm: float, max_bpm: float
+        path: Path,
+        *,
+        include_bpm: bool,
+        include_energy: bool,
+        min_bpm: float,
+        max_bpm: float,
+        energy_section_seconds: float,
     ) -> TrackAnalysis:
         if path.name == "bad.wav":
             raise ValueError("decoder rejected file")
@@ -97,9 +120,13 @@ def test_batch_reports_corrupt_cache_as_warning(
     track.write_bytes(b"audio")
     cache_path = tmp_path / "cache.json"
     cache_path.write_text("not-json", encoding="utf-8")
+
+    def fake_analyze(path: Path, **options: object) -> TrackAnalysis:
+        return _analysis(path)
+
     monkeypatch.setattr(
         "aerobictoolkit.analysis.batch.analyze_track",
-        lambda path, include_bpm, min_bpm, max_bpm: _analysis(path),
+        fake_analyze,
     )
 
     result = analyze_directory(music, cache_path=cache_path)

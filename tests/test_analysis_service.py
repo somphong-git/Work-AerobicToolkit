@@ -7,8 +7,9 @@ import pytest
 from aerobictoolkit.analysis.models import TrackMetadata
 from aerobictoolkit.analysis.service import (
     _scalar_tempo,
+    analyze_tempo,
     analyze_track,
-    estimate_bpm,
+    normalize_tempo,
     read_track_metadata,
 )
 
@@ -63,7 +64,7 @@ def test_scalar_tempo_accepts_scalar_and_array_like_values() -> None:
     assert _scalar_tempo(ArrayLike()) == 128.125
 
 
-def test_estimate_bpm_normalizes_librosa_array_result(
+def test_analyze_tempo_normalizes_octave_and_builds_confident_grid(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     track = tmp_path / "track.wav"
@@ -71,22 +72,65 @@ def test_estimate_bpm_normalizes_librosa_array_result(
 
     class Tempo:
         def item(self) -> float:
-            return 127.994
+            return 64.0
+
+    class Values:
+        def __init__(self, values: list[float]) -> None:
+            self.values = values
+
+        def tolist(self) -> list[float]:
+            return self.values
 
     class Beat:
         @staticmethod
-        def beat_track(*, y: object, sr: int) -> tuple[Tempo, object]:
-            return Tempo(), object()
+        def beat_track(*, onset_envelope: object, sr: int) -> tuple[Tempo, Values]:
+            return Tempo(), Values([0.0, 1.0, 2.0])
+
+    class Onset:
+        @staticmethod
+        def onset_strength(*, y: object, sr: int) -> object:
+            return object()
+
+    class Feature:
+        @staticmethod
+        def tempo(*, onset_envelope: object, sr: int, aggregate: None) -> Values:
+            return Values([64.0, 64.0, 63.8])
 
     class FakeLibrosa:
         beat = Beat()
+        onset = Onset()
+        feature = Feature()
 
         @staticmethod
         def load(path: Path, *, mono: bool, sr: None) -> tuple[object, int]:
             return object(), 44_100
 
+        @staticmethod
+        def frames_to_time(frames: Values, *, sr: int) -> Values:
+            return Values([0.0, 0.9375, 1.875])
+
     monkeypatch.setattr(
         "aerobictoolkit.analysis.service._load_librosa", lambda: FakeLibrosa()
     )
 
-    assert estimate_bpm(track) == 127.99
+    result = analyze_tempo(track)
+
+    assert result.raw_bpm == 64.0
+    assert result.normalized_bpm == 128.0
+    assert result.beat_grid.times_seconds == (0.0, 0.46875, 0.9375, 1.40625, 1.875)
+    assert result.confidence >= 0.8
+
+
+@pytest.mark.parametrize(
+    ("raw_bpm", "expected"),
+    [(64.0, 128.0), (128.0, 128.0), (256.0, 128.0)],
+)
+def test_normalize_tempo_resolves_half_and_double_time(
+    raw_bpm: float, expected: float
+) -> None:
+    assert normalize_tempo(raw_bpm) == expected
+
+
+def test_normalize_tempo_rejects_invalid_range() -> None:
+    with pytest.raises(ValueError, match="span at least one octave"):
+        normalize_tempo(128, min_bpm=100, max_bpm=150)

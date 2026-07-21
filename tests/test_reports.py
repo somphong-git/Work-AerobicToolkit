@@ -7,6 +7,7 @@ from pathlib import Path
 from aerobictoolkit.analysis.models import (
     BatchAnalysisResult,
     BatchTrackAnalysis,
+    BeatGrid,
     TrackAnalysis,
     TrackAnalysisError,
     TrackMetadata,
@@ -19,6 +20,9 @@ def test_reports_include_successes_cache_state_and_errors(tmp_path: Path) -> Non
     analysis = TrackAnalysis(
         TrackMetadata(track_path, "เพลง", "Artist", None, 180.0, "wav", 123),
         bpm=125.5,
+        raw_bpm=62.75,
+        bpm_confidence=0.91,
+        beat_grid=BeatGrid((0.25, 0.728, 1.206)),
     )
     result = BatchAnalysisResult(
         directory=tmp_path,
@@ -36,7 +40,11 @@ def test_reports_include_successes_cache_state_and_errors(tmp_path: Path) -> Non
 
     assert json_data["summary"]["cache_hits"] == 1
     assert json_data["summary"]["errors"] == 1
+    assert json_data["tracks"][0]["analysis"]["confidence_level"] == "high"
+    assert json_data["tracks"][0]["analysis"]["beat_grid"]["beat_count"] == 3
     assert csv_rows[0]["title"] == "เพลง"
     assert csv_rows[0]["from_cache"] == "True"
+    assert csv_rows[0]["bpm_confidence"] == "0.91"
+    assert csv_rows[0]["beat_count"] == "3"
     assert csv_rows[1]["status"] == "error"
     assert csv_rows[1]["error_type"] == "ValueError"

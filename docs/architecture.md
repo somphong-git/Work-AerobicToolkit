@@ -48,6 +48,21 @@ The cache fingerprints each source file by absolute path, size, modification
 time, and analysis profile. Cache failures become warnings; track failures are
 captured individually so one damaged file does not stop the directory job.
 
+## Tempo analysis flow
+
+```text
+Audio -> onset envelope -> raw tempo + beat frames
+                              |              |
+                              v              v
+                     octave normalization   beat grid
+                              \              /
+                               confidence score
+```
+
+Raw detector output is retained alongside normalized BPM. Confidence combines
+beat-grid regularity, frame-level tempo agreement, and evidence size. These are
+engine values, so every future interface receives the same interpretation.
+
 ## Dependency direction
 
 ```text

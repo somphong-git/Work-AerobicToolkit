@@ -1,20 +1,21 @@
 # Roadmap
 
-## Current: Sprint 2.4 — Batch Analysis and Cache
+## Current: Sprint 2.5 — BPM Confidence and Beat Grid
 
-The current release makes core analysis practical for a local music library.
+The current release improves tempo reliability before playlist decisions are
+built on top of analysis results.
 
-- [x] Analyze every supported track in a directory.
-- [x] Reuse unchanged results from a persistent cache.
-- [x] Invalidate cache entries when a file or analysis profile changes.
-- [x] Continue after per-track decoder or analysis failures.
-- [x] Export complete UTF-8 JSON and Excel-friendly CSV reports.
-- [x] Expose the workflow through a production-facing CLI command.
+- [x] Preserve raw BPM and normalize half-time/double-time estimates.
+- [x] Support configurable one-octave tempo ranges.
+- [x] Generate normalized beat positions in seconds.
+- [x] Calculate confidence from regularity, tempo agreement, and beat evidence.
+- [x] Expose low, medium, and high confidence levels.
+- [x] Include tempo details in cache, JSON, CSV, CLI, and batch workflows.
 
-## Next: BPM confidence and beat-grid analysis
+## Next: energy analysis
 
-The next sprint will improve tempo reliability with confidence information,
-tempo-range normalization, and beat timing. Energy analysis, playlist
+The next sprint will derive perceptual energy and intensity sections for
+warm-up, cardio, peak, and cool-down planning. Musical-key analysis, playlist
 optimization, and mix rendering remain later milestones.
 
 ## Delivery rules

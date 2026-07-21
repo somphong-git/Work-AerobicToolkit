@@ -6,9 +6,9 @@ import json
 from pathlib import Path
 from typing import Any
 
-from .models import TrackAnalysis, TrackMetadata
+from .models import BeatGrid, TrackAnalysis, TrackMetadata
 
-CACHE_SCHEMA_VERSION = 1
+CACHE_SCHEMA_VERSION = 2
 
 
 class AnalysisCache:
@@ -20,11 +20,19 @@ class AnalysisCache:
         self._entries: dict[str, dict[str, Any]] = {}
         self._load()
 
-    def get(self, path: Path, *, include_bpm: bool) -> TrackAnalysis | None:
+    def get(
+        self,
+        path: Path,
+        *,
+        include_bpm: bool,
+        min_bpm: float,
+        max_bpm: float,
+    ) -> TrackAnalysis | None:
         """Return a current cached result, or ``None`` when it must be analyzed."""
         key = str(path.resolve())
         entry = self._entries.get(key)
-        if entry is None or entry.get("fingerprint") != _fingerprint(path, include_bpm):
+        fingerprint = _fingerprint(path, include_bpm, min_bpm, max_bpm)
+        if entry is None or entry.get("fingerprint") != fingerprint:
             return None
 
         try:
@@ -34,11 +42,18 @@ class AnalysisCache:
             self._entries.pop(key, None)
             return None
 
-    def put(self, analysis: TrackAnalysis, *, include_bpm: bool) -> None:
+    def put(
+        self,
+        analysis: TrackAnalysis,
+        *,
+        include_bpm: bool,
+        min_bpm: float,
+        max_bpm: float,
+    ) -> None:
         """Stage one successful result for persistence."""
         path = analysis.metadata.path.resolve()
         self._entries[str(path)] = {
-            "fingerprint": _fingerprint(path, include_bpm),
+            "fingerprint": _fingerprint(path, include_bpm, min_bpm, max_bpm),
             "analysis": analysis.to_dict(),
         }
 
@@ -78,12 +93,15 @@ class AnalysisCache:
             self.warnings.append(f"Ignored unreadable analysis cache: {error}")
 
 
-def _fingerprint(path: Path, include_bpm: bool) -> dict[str, object]:
+def _fingerprint(
+    path: Path, include_bpm: bool, min_bpm: float, max_bpm: float
+) -> dict[str, object]:
     stat = path.stat()
     return {
         "size": stat.st_size,
         "modified_ns": stat.st_mtime_ns,
-        "profile": "metadata+bpm-v1" if include_bpm else "metadata-v1",
+        "profile": "tempo-confidence+beat-grid-v1" if include_bpm else "metadata-v1",
+        "tempo_range": [min_bpm, max_bpm] if include_bpm else None,
     }
 
 
@@ -99,4 +117,18 @@ def _analysis_from_dict(data: dict[str, Any]) -> TrackAnalysis:
         file_size_bytes=int(metadata_data["file_size_bytes"]),
     )
     bpm = data.get("bpm")
-    return TrackAnalysis(metadata=metadata, bpm=float(bpm) if bpm is not None else None)
+    raw_bpm = data.get("raw_bpm")
+    confidence = data.get("bpm_confidence")
+    beat_grid_data = data.get("beat_grid")
+    beat_grid = None
+    if beat_grid_data is not None:
+        beat_grid = BeatGrid(
+            tuple(float(value) for value in beat_grid_data.get("times_seconds", ()))
+        )
+    return TrackAnalysis(
+        metadata=metadata,
+        bpm=float(bpm) if bpm is not None else None,
+        raw_bpm=float(raw_bpm) if raw_bpm is not None else None,
+        bpm_confidence=float(confidence) if confidence is not None else None,
+        beat_grid=beat_grid,
+    )

@@ -18,7 +18,13 @@ CSV_FIELDS = (
     "duration_seconds",
     "file_format",
     "file_size_bytes",
+    "raw_bpm",
     "bpm",
+    "bpm_confidence",
+    "confidence_level",
+    "beat_count",
+    "first_beat_seconds",
+    "beat_times_seconds",
     "error_type",
     "error_message",
 )
@@ -52,7 +58,25 @@ def write_csv_report(result: BatchAnalysisResult, path: str | Path) -> Path:
                     "duration_seconds": metadata.duration_seconds,
                     "file_format": metadata.file_format,
                     "file_size_bytes": metadata.file_size_bytes,
+                    "raw_bpm": item.analysis.raw_bpm,
                     "bpm": item.analysis.bpm,
+                    "bpm_confidence": item.analysis.bpm_confidence,
+                    "confidence_level": item.analysis.confidence_level,
+                    "beat_count": (
+                        item.analysis.beat_grid.beat_count
+                        if item.analysis.beat_grid
+                        else 0
+                    ),
+                    "first_beat_seconds": (
+                        item.analysis.beat_grid.first_beat_seconds
+                        if item.analysis.beat_grid
+                        else ""
+                    ),
+                    "beat_times_seconds": (
+                        json.dumps(item.analysis.beat_grid.times_seconds)
+                        if item.analysis.beat_grid
+                        else ""
+                    ),
                     "error_type": "",
                     "error_message": "",
                 }
@@ -69,7 +93,13 @@ def write_csv_report(result: BatchAnalysisResult, path: str | Path) -> Path:
                     "duration_seconds": "",
                     "file_format": error.path.suffix.removeprefix(".").lower(),
                     "file_size_bytes": "",
+                    "raw_bpm": "",
                     "bpm": "",
+                    "bpm_confidence": "",
+                    "confidence_level": "",
+                    "beat_count": "",
+                    "first_beat_seconds": "",
+                    "beat_times_seconds": "",
                     "error_type": error.error_type,
                     "error_message": error.message,
                 }

@@ -32,10 +32,63 @@ class TrackAnalysis:
 
     metadata: TrackMetadata
     bpm: float | None
+    raw_bpm: float | None = None
+    bpm_confidence: float | None = None
+    beat_grid: BeatGrid | None = None
 
     def to_dict(self) -> dict[str, object]:
         """Return a JSON-friendly representation of the analysis result."""
-        return {"metadata": self.metadata.to_dict(), "bpm": self.bpm}
+        return {
+            "metadata": self.metadata.to_dict(),
+            "bpm": self.bpm,
+            "raw_bpm": self.raw_bpm,
+            "bpm_confidence": self.bpm_confidence,
+            "confidence_level": self.confidence_level,
+            "beat_grid": self.beat_grid.to_dict() if self.beat_grid else None,
+        }
+
+    @property
+    def confidence_level(self) -> str | None:
+        """Return a human-readable confidence band."""
+        if self.bpm_confidence is None:
+            return None
+        if self.bpm_confidence >= 0.8:
+            return "high"
+        if self.bpm_confidence >= 0.5:
+            return "medium"
+        return "low"
+
+
+@dataclass(frozen=True, slots=True)
+class BeatGrid:
+    """Normalized beat locations measured in seconds from track start."""
+
+    times_seconds: tuple[float, ...]
+
+    @property
+    def beat_count(self) -> int:
+        return len(self.times_seconds)
+
+    @property
+    def first_beat_seconds(self) -> float | None:
+        return self.times_seconds[0] if self.times_seconds else None
+
+    def to_dict(self) -> dict[str, object]:
+        return {
+            "beat_count": self.beat_count,
+            "first_beat_seconds": self.first_beat_seconds,
+            "times_seconds": list(self.times_seconds),
+        }
+
+
+@dataclass(frozen=True, slots=True)
+class TempoAnalysis:
+    """Raw and normalized tempo with confidence and beat timing."""
+
+    raw_bpm: float
+    normalized_bpm: float
+    confidence: float
+    beat_grid: BeatGrid
 
 
 @dataclass(frozen=True, slots=True)

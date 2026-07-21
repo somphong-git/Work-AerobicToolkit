@@ -41,6 +41,7 @@ def build_parser() -> argparse.ArgumentParser:
     analyze_parser.add_argument(
         "--json", action="store_true", help="Print the result as JSON."
     )
+    _add_tempo_range_options(analyze_parser)
 
     batch_parser = commands.add_parser(
         "batch", help="Analyze a directory and write JSON and CSV reports."
@@ -70,6 +71,7 @@ def build_parser() -> argparse.ArgumentParser:
         default=Path("data/reports/analysis-report.csv"),
         help="CSV report path.",
     )
+    _add_tempo_range_options(batch_parser)
     return parser
 
 
@@ -83,7 +85,12 @@ def main() -> int:
             for track in scan_music(args.directory):
                 print(track)
         elif args.command == "analyze":
-            result = analyze_track(args.path, include_bpm=not args.no_bpm)
+            result = analyze_track(
+                args.path,
+                include_bpm=not args.no_bpm,
+                min_bpm=args.min_bpm,
+                max_bpm=args.max_bpm,
+            )
             if args.json:
                 print(json.dumps(result.to_dict(), ensure_ascii=False, indent=2))
             else:
@@ -93,7 +100,7 @@ def main() -> int:
         else:
             parser.print_help()
         return 0
-    except (AudioAnalysisDependencyError, OSError) as error:
+    except (AudioAnalysisDependencyError, OSError, ValueError) as error:
         print(f"Error: {error}", file=sys.stderr)
         return 2
 
@@ -105,6 +112,11 @@ def _print_analysis(result: TrackAnalysis) -> None:
     print(f"Artist: {metadata.artist or '-'}")
     print(f"Duration: {metadata.duration_seconds or '-'} seconds")
     print(f"BPM: {result.bpm or '-'}")
+    print(f"Raw BPM: {result.raw_bpm or '-'}")
+    confidence = result.bpm_confidence
+    print(f"Confidence: {confidence if confidence is not None else '-'}")
+    print(f"Confidence level: {result.confidence_level or '-'}")
+    print(f"Beats detected: {result.beat_grid.beat_count if result.beat_grid else 0}")
 
 
 def _run_batch(args: argparse.Namespace) -> int:
@@ -113,6 +125,8 @@ def _run_batch(args: argparse.Namespace) -> int:
         args.directory,
         include_bpm=not args.no_bpm,
         cache_path=cache_path,
+        min_bpm=args.min_bpm,
+        max_bpm=args.max_bpm,
     )
     json_path = write_json_report(result, args.json_report)
     csv_path = write_csv_report(result, args.csv_report)
@@ -137,6 +151,21 @@ def _print_batch_summary(
             f"Failed: {error.path} ({error.error_type}: {error.message})",
             file=sys.stderr,
         )
+
+
+def _add_tempo_range_options(parser: argparse.ArgumentParser) -> None:
+    parser.add_argument(
+        "--min-bpm",
+        type=float,
+        default=90.0,
+        help="Lower bound for octave-normalized BPM (default: 90).",
+    )
+    parser.add_argument(
+        "--max-bpm",
+        type=float,
+        default=180.0,
+        help="Upper bound for octave-normalized BPM (default: 180).",
+    )
 
 
 def _configure_stdout() -> None:

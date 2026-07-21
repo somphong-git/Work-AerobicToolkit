@@ -12,7 +12,11 @@ def main() -> None:
         raise SystemExit(2)
 
     result = analyze_track(Path(sys.argv[1]))
-    print(f"{result.metadata.title}: {result.bpm} BPM")
+    print(f"Title: {result.metadata.title}")
+    print(f"Normalized BPM: {result.bpm}")
+    print(f"Raw BPM: {result.raw_bpm}")
+    print(f"Confidence: {result.bpm_confidence} ({result.confidence_level})")
+    print(f"Beat count: {result.beat_grid.beat_count if result.beat_grid else 0}")
 
 
 if __name__ == "__main__":

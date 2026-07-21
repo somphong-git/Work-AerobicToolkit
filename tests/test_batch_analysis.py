@@ -34,7 +34,9 @@ def test_batch_uses_cache_and_invalidates_changed_files(
     second_track.write_bytes(b"second")
     calls: list[Path] = []
 
-    def fake_analyze(path: Path, *, include_bpm: bool) -> TrackAnalysis:
+    def fake_analyze(
+        path: Path, *, include_bpm: bool, min_bpm: float, max_bpm: float
+    ) -> TrackAnalysis:
         calls.append(path)
         return _analysis(path, 128.0 if include_bpm else None)
 
@@ -45,12 +47,17 @@ def test_batch_uses_cache_and_invalidates_changed_files(
     second = analyze_directory(music, cache_path=cache_path)
     first_track.write_bytes(b"first changed")
     third = analyze_directory(music, cache_path=cache_path)
+    fourth = analyze_directory(
+        music, cache_path=cache_path, min_bpm=100.0, max_bpm=200.0
+    )
 
     assert first.analyzed_count == 2
     assert second.cache_hit_count == 2
     assert third.cache_hit_count == 1
     assert third.analyzed_count == 1
-    assert len(calls) == 3
+    assert fourth.cache_hit_count == 0
+    assert fourth.analyzed_count == 2
+    assert len(calls) == 5
 
 
 def test_batch_captures_bad_track_without_stopping_directory(
@@ -63,7 +70,9 @@ def test_batch_captures_bad_track_without_stopping_directory(
     good.write_bytes(b"good")
     bad.write_bytes(b"bad")
 
-    def fake_analyze(path: Path, *, include_bpm: bool) -> TrackAnalysis:
+    def fake_analyze(
+        path: Path, *, include_bpm: bool, min_bpm: float, max_bpm: float
+    ) -> TrackAnalysis:
         if path.name == "bad.wav":
             raise ValueError("decoder rejected file")
         return _analysis(path)
@@ -90,7 +99,7 @@ def test_batch_reports_corrupt_cache_as_warning(
     cache_path.write_text("not-json", encoding="utf-8")
     monkeypatch.setattr(
         "aerobictoolkit.analysis.batch.analyze_track",
-        lambda path, include_bpm: _analysis(path),
+        lambda path, include_bpm, min_bpm, max_bpm: _analysis(path),
     )
 
     result = analyze_directory(music, cache_path=cache_path)
